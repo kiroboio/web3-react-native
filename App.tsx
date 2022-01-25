@@ -50,9 +50,6 @@ const App = () => {
         </View>
       </ScrollView> */}
       <SrcApp />
-      <>
-        <Text>some text here</Text>
-      </>
     </SafeAreaView>
   );
 };

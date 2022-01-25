@@ -4,13 +4,15 @@ import {
   observer,
   useWallet,
   configureReactotronDebugging,
+  currencyValueToWei,
 } from './dev';
 import React, {useEffect} from 'react';
 
-import {View, Text} from 'react-native';
+import {View, Text, Button} from 'react-native';
 
 export const Connect = observer(() => {
-  const {address, active, wallet, connect, balance, block, deposit } = useAccount();
+  const {address, active, wallet, connect, balance, block, deposit} =
+    useAccount();
   const {setNewMnemonic} = useWallet();
   console.log({address, active, balance, block});
   useEffect(() => {
@@ -23,9 +25,20 @@ export const Connect = observer(() => {
     return connect.run(Connectors.InAppWallet);
   }, []);
 
+  const handleDeposit = () => {
+    console.log('click');
+    deposit.run({
+      to: '0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc',
+      value: currencyValueToWei('0.0001', 18),
+      passcode: '123321',
+    });
+  };
+
+  if (deposit.is.running) return <Text>Running...</Text>;
   return (
     <View>
       <Text>test</Text>
+      <Button title="deposit" onPress={handleDeposit} />
     </View>
   );
 });

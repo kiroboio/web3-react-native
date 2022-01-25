@@ -2065,6 +2065,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
       secret: 'Ijoia2lyb2JvIiwic3ViIjoiNWU2MTNiNmVlYzgzMWQx' ?? '',
     };
 
+    console.log('createInstance');
     KiroboService.createInstance(
       {
         key: authDetails.key,
@@ -2072,7 +2073,9 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
       },
       (message: string, payload: any) => {
         const setCanGetRewards = __setCanGetRewards.current;
+        console.log('createInstance callback');
         if (message === 'authorized') {
+          console.log('createInstance authorized');
           setCanGetRewards(!!payload?.rewards);
           setStatus(true);
         }
@@ -2090,6 +2093,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
   // on api server authorized event
   useEffect(() => {
     const service = KiroboService.getInstance();
+    console.log({status, service});
     if (status && service) {
       const networkService = service.getService(SERVICE.NETWORKS);
       const ratesService = service.getService(SERVICE.RATES);
@@ -2143,7 +2147,12 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             query: {source: 'coingecko.com', watch: 'replace'},
           });
 
+          console.log('set contract data');
           for (const network of networks.data) {
+            console.log(
+              network.contracts.safeTransfer,
+              'network.contracts.safeTransfer',
+            );
             setNetworkDetails(network);
             if (network?.contracts?.safeTransfer) {
               __setSafeTransferContract.current(
@@ -2239,6 +2248,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
     const web3 = __web3.current;
     const chainId = __chainId.current;
     if (!web3) return;
+    console.log('setSafeTransferContractWeb3', safeTransferContract?.address);
     const setSafeTransferAsync = async () => {
       if (web3 && chainId && safeTransferContract) {
         setSafeTransferContractWeb3(
