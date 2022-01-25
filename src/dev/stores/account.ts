@@ -1,117 +1,117 @@
-import { values } from "mobx";
+import {values} from 'mobx';
 import {
   EthTransferResponseDto,
   EthTokenInfo,
   EthSwapInfo,
-} from "../dto/EthTransfersDto";
-import { generateMnemonic } from "bip39";
+} from '../dto/EthTransfersDto';
+import {generateMnemonic} from 'bip39';
 
-import { castToSnapshot, getSnapshot, Instance, types } from "mobx-state-tree";
+import {castToSnapshot, getSnapshot, Instance, types} from 'mobx-state-tree';
 
-import { sha3, toBN } from "web3-utils";
+import {sha3, toBN} from 'web3-utils';
 
-import Web3 from "web3";
-import { Connectors } from "../hooks/useWeb3";
-import { currencyValueToWei } from "../utils";
-import { isMobile } from "../utils/isMobile";
+import Web3 from 'web3';
+import {Connectors} from '../hooks/useWeb3';
+import {currencyValueToWei} from '../utils';
+import {isMobile} from '../utils/isMobile';
 
 type MobxClearInstance<T> = Omit<Instance<T>, symbol>;
 
 export const getChainName = (chainId: number | undefined) => {
-  if (chainId === 1) return "main";
-  if (chainId === 4) return "rinkeby";
-  return "";
+  if (chainId === 1) return 'main';
+  if (chainId === 4) return 'rinkeby';
+  return '';
 };
 
 export const tokens = {
   KIRO: {
-    label: "KIRO",
+    label: 'KIRO',
     address: {
-      "4": "0xB678E95F83aF08E7598EC21533F7585E83272799",
-      "1": "0xb1191f691a355b43542bea9b8847bc73e7abb137",
+      '4': '0xB678E95F83aF08E7598EC21533F7585E83272799',
+      '1': '0xb1191f691a355b43542bea9b8847bc73e7abb137',
     },
-    symbol: "KIRO",
+    symbol: 'KIRO',
     decimals: 18,
   },
   LINK: {
-    label: "LINK",
+    label: 'LINK',
     address: {
-      "4": "0x01be23585060835e02b77ef475b0cc51aa1e0709",
-      "1": "0x514910771af9ca656af840dff83e8264ecf986ca",
+      '4': '0x01be23585060835e02b77ef475b0cc51aa1e0709',
+      '1': '0x514910771af9ca656af840dff83e8264ecf986ca',
     },
-    symbol: "LINK",
+    symbol: 'LINK',
     decimals: 18,
   },
   USDT: {
-    label: "Tether",
+    label: 'Tether',
     address: {
-      "4": "0xb19ed150325db38b397cb134533cb45a2b2b62a3",
-      "1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      '4': '0xb19ed150325db38b397cb134533cb45a2b2b62a3',
+      '1': '0xdac17f958d2ee523a2206206994597c13d831ec7',
     },
-    symbol: "USDT",
+    symbol: 'USDT',
     decimals: 6,
   },
   USDC: {
-    label: "USD Coin",
+    label: 'USD Coin',
     address: {
-      "4": "0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b",
-      "1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      '4': '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      '1': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     },
-    symbol: "USDC",
+    symbol: 'USDC',
     decimals: 6,
   },
   BNB: {
-    label: "Binance Coin",
+    label: 'Binance Coin',
     address: {
-      "4": "0x2211dc5e1b4c34efe0027561e2f36c2d63fbd01c",
-      "1": "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
+      '4': '0x2211dc5e1b4c34efe0027561e2f36c2d63fbd01c',
+      '1': '0xB8c77482e45F1F44dE1745F52C74426C631bDD52',
     },
-    symbol: "BNB",
+    symbol: 'BNB',
     decimals: 18,
   },
   UNI: {
-    label: "Uniswap",
+    label: 'Uniswap',
     address: {
-      "4": "0x7f0fae34de2b34d13da640afc2273366919cd0b2",
-      "1": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+      '4': '0x7f0fae34de2b34d13da640afc2273366919cd0b2',
+      '1': '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
     },
-    symbol: "UNI",
+    symbol: 'UNI',
     decimals: 18,
   },
   SUSHI: {
-    label: "Sushi Token",
+    label: 'Sushi Token',
     address: {
-      "4": "0x1bfc4d6b40591b8c8e1ef8a36e4f15d54d760110",
-      "1": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+      '4': '0x1bfc4d6b40591b8c8e1ef8a36e4f15d54d760110',
+      '1': '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
     },
-    symbol: "SUSHI",
+    symbol: 'SUSHI',
     decimals: 18,
   },
   WBTC: {
-    label: "Wrapped BTC",
+    label: 'Wrapped BTC',
     address: {
-      "4": "0x577D296678535e4903D59A4C929B718e1D575e0A",
-      "1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+      '4': '0x577D296678535e4903D59A4C929B718e1D575e0A',
+      '1': '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
     },
-    symbol: "WBTC",
+    symbol: 'WBTC',
     decimals: 8,
   },
   DAI: {
-    label: "Dai",
+    label: 'Dai',
     address: {
-      "4": "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea",
-      "1": "0x6b175474e89094c44da98b954eedeac495271d0f",
+      '4': '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      '1': '0x6b175474e89094c44da98b954eedeac495271d0f',
     },
-    symbol: "DAI",
+    symbol: 'DAI',
     decimals: 18,
   },
   MANA: {
-    label: "Mana",
+    label: 'Mana',
     address: {
-      "4": "0x6142214d83670226872d51e935fb57bec8832a60",
-      "1": "0x0f5d2fb29fb7d3cfee444a200298f468908cc942",
+      '4': '0x6142214d83670226872d51e935fb57bec8832a60',
+      '1': '0x0f5d2fb29fb7d3cfee444a200298f468908cc942',
     },
-    symbol: "MANA",
+    symbol: 'MANA',
     decimals: 18,
   },
 };
@@ -124,7 +124,7 @@ export interface ITransferItem {
   fees: string;
   salt: string;
   secretHash: string;
-  state: EthTransferResponseDto["state"];
+  state: EthTransferResponseDto['state'];
   txid: string;
   updatedAt: Date;
   confirmedBlock: number;
@@ -134,49 +134,49 @@ export interface ITransferItem {
 }
 
 export type Currency =
-  | "ETH"
-  | "KIRO"
-  | "USDT"
-  | "BNB"
-  | "UNI"
-  | "LINK"
-  | "SUSHI"
-  | "USDC"
-  | "WBTC"
-  | "DAI";
+  | 'ETH'
+  | 'KIRO'
+  | 'USDT'
+  | 'BNB'
+  | 'UNI'
+  | 'LINK'
+  | 'SUSHI'
+  | 'USDC'
+  | 'WBTC'
+  | 'DAI';
 
 const StatePrimitive = types.custom<
-  EthTransferResponseDto["state"],
-  EthTransferResponseDto["state"]
+  EthTransferResponseDto['state'],
+  EthTransferResponseDto['state']
 >({
-  name: "state",
-  fromSnapshot(value: EthTransferResponseDto["state"]) {
+  name: 'state',
+  fromSnapshot(value: EthTransferResponseDto['state']) {
     return value;
   },
-  toSnapshot(value: EthTransferResponseDto["state"]) {
+  toSnapshot(value: EthTransferResponseDto['state']) {
     return value;
   },
   isTargetType(): boolean {
     return true;
   },
   getValidationMessage(): string {
-    return "";
+    return '';
     // if (/^-?\d+\.\d+$/.test(value)) return "" // OK
     // return `'${value}' doesn't look like a valid state`
   },
 });
 
 export const Token = types.model({
-  address: types.optional(types.string, ""),
+  address: types.optional(types.string, ''),
   decimals: types.optional(types.number, 0),
-  symbol: types.optional(types.string, ""),
-  type: types.optional(types.string, ""),
+  symbol: types.optional(types.string, ''),
+  type: types.optional(types.string, ''),
 });
 
 export const Swap = types.model({
-  value: types.optional(types.string, ""),
+  value: types.optional(types.string, ''),
   token: types.optional(Token, {}),
-  fees: types.optional(types.string, ""),
+  fees: types.optional(types.string, ''),
 });
 
 export interface ITransferToken extends MobxClearInstance<typeof Token> {}
@@ -198,8 +198,8 @@ export const Transfer = types
     token: types.optional(Token, {}),
     swap: types.optional(Swap, {}),
   })
-  .actions((self) => ({
-    update(state: EthTransferResponseDto["state"], txid?: string) {
+  .actions(self => ({
+    update(state: EthTransferResponseDto['state'], txid?: string) {
       self.updatedAt = new Date();
       self.state = state;
       if (txid) self.txid = txid;
@@ -214,16 +214,16 @@ export const CmdStatus = types
     running: types.optional(types.boolean, false),
     done: types.optional(types.boolean, false),
     failed: types.optional(types.boolean, false),
-    withFailMessage: types.optional(types.string, ""),
+    withFailMessage: types.optional(types.string, ''),
     withId: types.optional(types.number, 0),
   })
-  .actions((self) => ({
+  .actions(self => ({
     clear() {
       self.ready = false;
       self.running = false;
       self.done = false;
       self.failed = false;
-      self.withFailMessage = "";
+      self.withFailMessage = '';
       self.withId = self.withId + 1;
     },
     prepared() {
@@ -231,7 +231,7 @@ export const CmdStatus = types
       self.running = false;
       self.done = false;
       self.failed = false;
-      self.withFailMessage = "";
+      self.withFailMessage = '';
       self.withId = self.withId + 1;
     },
     started() {
@@ -239,7 +239,7 @@ export const CmdStatus = types
       self.done = false;
       self.failed = false;
     },
-    finished(err?: { err: { message: string } }) {
+    finished(err?: {err: {message: string}}) {
       self.ready = false;
       self.running = false;
       if (err) {
@@ -248,7 +248,7 @@ export const CmdStatus = types
       } else {
         self.done = true;
         self.failed = false;
-        self.withFailMessage = "";
+        self.withFailMessage = '';
       }
     },
   }));
@@ -268,12 +268,12 @@ export const CmdActions = (self: {
   done() {
     self.is.finished();
   },
-  failed({ message }: { message: string }) {
-    self.is.finished({ err: { message } });
+  failed({message}: {message: string}) {
+    self.is.finished({err: {message}});
   },
   clearErrors() {
     self.is.failed = false;
-    self.is.withFailMessage = "";
+    self.is.withFailMessage = '';
   },
   clear() {
     self.is.clear();
@@ -282,22 +282,22 @@ export const CmdActions = (self: {
 
 export interface ICmdActions extends MobxClearInstance<typeof CmdActions> {}
 
-export const CmdBase = types.model("CMDBase", CmdModel).actions(CmdActions);
+export const CmdBase = types.model('CMDBase', CmdModel).actions(CmdActions);
 
 export interface ICmdBase extends MobxClearInstance<typeof CmdBase> {
   is: ICmdStatus;
 }
 
-export const ConnectCmd = CmdBase.named("ConnectCmd")
+export const ConnectCmd = CmdBase.named('ConnectCmd')
   .props({
-    connector: types.optional(types.string, ""),
+    connector: types.optional(types.string, ''),
     isConnected: types.optional(types.boolean, false),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(connector: Connectors | undefined) {
       if (!connector) {
         self.isConnected = false;
-        self.connector = "";
+        self.connector = '';
         return;
       }
       if (!self.is.running) {
@@ -312,7 +312,7 @@ export interface IConnectCmd extends MobxClearInstance<typeof ConnectCmd> {
   is: ICmdStatus;
 }
 
-export const DisconnectCmd = CmdBase.named("DisconnectCmd").actions((self) => ({
+export const DisconnectCmd = CmdBase.named('DisconnectCmd').actions(self => ({
   prepare() {
     if (!self.is.running) {
       self.is.prepared();
@@ -333,17 +333,17 @@ export interface ISafeTransferItem {
 }
 
 export const SafeTransfer = types
-  .model("SafeTransfer", {
-    address: types.optional(types.string, ""),
+  .model('SafeTransfer', {
+    address: types.optional(types.string, ''),
     synced: types.optional(types.boolean, false),
-    feesFormula: types.optional(types.string, ""),
-    rewardFormula: types.optional(types.string, ""),
+    feesFormula: types.optional(types.string, ''),
+    rewardFormula: types.optional(types.string, ''),
   })
   .volatile(() => ({
-    fees: (_value: string) => "0",
-    reward: (_value: string, _stakingValue: string, _fees: string) => "0",
+    fees: (_value: string) => '0',
+    reward: (_value: string, _stakingValue: string, _fees: string) => '0',
   }))
-  .actions((self) => ({
+  .actions(self => ({
     setData(data: ISafeTransferItem) {
       if (self.feesFormula !== data.feesFormula && data.feesFormula) {
         try {
@@ -352,11 +352,11 @@ export const SafeTransfer = types
             new Function(formula.arguments, formula.body)(
               Web3.utils.toBN,
               toBN,
-              value
+              value,
             );
           self.feesFormula = data.feesFormula;
         } catch (e) {
-          console.log("zxc error", e);
+          console.log('zxc error', e);
         }
       }
       if (self.rewardFormula !== data.rewardFormula && data.rewardFormula) {
@@ -368,11 +368,11 @@ export const SafeTransfer = types
               toBN,
               value,
               stakingValue,
-              fees
+              fees,
             );
           self.rewardFormula = data.rewardFormula;
         } catch (e) {
-          console.log("zxc error", e);
+          console.log('zxc error', e);
         }
       }
       self.synced = data.synced;
@@ -386,12 +386,12 @@ export interface IStakingItem {
 }
 
 export const Staking = types
-  .model("Staking", {
-    address: types.optional(types.string, ""),
-    balance: types.optional(types.string, ""),
+  .model('Staking', {
+    address: types.optional(types.string, ''),
+    balance: types.optional(types.string, ''),
   })
-  .actions((self) => ({
-    setData({ address }: IStakingItem) {
+  .actions(self => ({
+    setData({address}: IStakingItem) {
       self.address = address;
     },
   }));
@@ -402,11 +402,11 @@ export interface IKiroTokenItem {
 }
 
 export const KiroToken = types
-  .model("KiroToken", {
-    address: types.optional(types.string, ""),
+  .model('KiroToken', {
+    address: types.optional(types.string, ''),
   })
-  .actions((self) => ({
-    setData({ address }: IKiroTokenItem) {
+  .actions(self => ({
+    setData({address}: IKiroTokenItem) {
       self.address = address;
     },
   }));
@@ -423,21 +423,21 @@ export interface IERC20TokenItem {
 }
 
 export const ERC20Token = types
-  .model("ERC20Token", {
-    address: types.optional(types.string, ""),
-    name: types.optional(types.string, ""),
-    symbol: types.optional(types.string, ""),
+  .model('ERC20Token', {
+    address: types.optional(types.string, ''),
+    name: types.optional(types.string, ''),
+    symbol: types.optional(types.string, ''),
     decimals: types.optional(types.number, 18),
-    balance: types.optional(types.string, ""),
+    balance: types.optional(types.string, ''),
     rate: types.optional(types.number, 0),
   })
-  .views((self) => ({
+  .views(self => ({
     get tokenBalance() {
       return self.balance;
     },
   }))
-  .actions((self) => ({
-    setData({ address, name, symbol, decimals, balance }: IERC20TokenItem) {
+  .actions(self => ({
+    setData({address, name, symbol, decimals, balance}: IERC20TokenItem) {
       self.address = address;
       self.name = name;
       self.symbol = symbol;
@@ -448,7 +448,7 @@ export const ERC20Token = types
       self.balance = balance;
     },
     clearBalance() {
-      self.balance = "";
+      self.balance = '';
     },
     setRate(rate: number) {
       self.rate = rate;
@@ -456,15 +456,15 @@ export const ERC20Token = types
   }));
 
 export const ERC20Tokens = types
-  .model("ERC20Token", {
+  .model('ERC20Token', {
     map: types.map(ERC20Token),
   })
-  .views((self) => ({
+  .views(self => ({
     get list() {
       return Array.from(self.map.values());
     },
   }))
-  .actions((self) => ({
+  .actions(self => ({
     addToken({
       address,
       name,
@@ -475,14 +475,14 @@ export const ERC20Tokens = types
     }: IERC20TokenItem) {
       self.map.set(
         address,
-        ERC20Token.create({ address, name, symbol, decimals, balance, rate })
+        ERC20Token.create({address, name, symbol, decimals, balance, rate}),
       );
     },
     setBalance(address: string, balance: string) {
       self.map.get(address)?.setBalance(balance);
     },
     clearBalances() {
-      self.map.forEach((erc20Token) => erc20Token.clearBalance());
+      self.map.forEach(erc20Token => erc20Token.clearBalance());
     },
     setRate(address: string, rate: number) {
       self.map.get(address)?.setRate(rate);
@@ -491,7 +491,7 @@ export const ERC20Tokens = types
 
 type MobxClearERC20Tokens = Omit<
   Instance<typeof ERC20Tokens>,
-  symbol | "map" | "list"
+  symbol | 'map' | 'list'
 >;
 
 export interface IERC20Tokens extends MobxClearInstance<MobxClearERC20Tokens> {
@@ -507,17 +507,14 @@ export interface DeviceInfoData {
 }
 
 export const DeviceInfo = types
-  .model("DeviceInfo", {
+  .model('DeviceInfo', {
     isMobile: types.optional(types.boolean, isMobile),
-    isApp: types.optional(
-      types.boolean,
-      isMobile,
-    ),
+    isApp: types.optional(types.boolean, isMobile),
     haveMetaMask: types.optional(types.boolean, false),
     ethereumProvider: types.optional(types.boolean, false),
     loggedIn: types.optional(types.boolean, false),
   })
-  .actions((self) => ({
+  .actions(self => ({
     setData({
       isMobile,
       isApp,
@@ -536,7 +533,7 @@ export const DeviceInfo = types
 export interface IDeviceInfo extends MobxClearInstance<typeof DeviceInfo> {}
 
 const EthAddressPrimitive = types.custom<string, string>({
-  name: "Eth Address",
+  name: 'Eth Address',
   fromSnapshot(value: string) {
     return value;
   },
@@ -549,7 +546,7 @@ const EthAddressPrimitive = types.custom<string, string>({
     return value instanceof String;
   },
   getValidationMessage(value: string): string {
-    if (value === "" || /^0x[a-fA-F0-9]{40}$/.test(value)) return "";
+    if (value === '' || /^0x[a-fA-F0-9]{40}$/.test(value)) return '';
     return `'${value}' doesn't look like a valid ethereum address`;
   },
 });
@@ -557,15 +554,15 @@ const EthAddressPrimitive = types.custom<string, string>({
 export interface IEthAddressPrimitive
   extends MobxClearInstance<typeof EthAddressPrimitive> {}
 
-export const ApprovedCmd = CmdBase.named("ApprovedCmd")
+export const ApprovedCmd = CmdBase.named('ApprovedCmd')
   .props({
     amount: types.optional(
       types.string,
-      "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+      '115792089237316195423570985008687907853269984665640564039457584007913129639935',
     ),
-    contractAddress: types.optional(types.string, ""),
+    contractAddress: types.optional(types.string, ''),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(contractAddress: string) {
       if (!self.is.running) {
         self.contractAddress = contractAddress;
@@ -593,13 +590,13 @@ export interface SendCmdParams {
   value: string;
 }
 
-export const SendCmd = CmdBase.named("SendCmd")
+export const SendCmd = CmdBase.named('SendCmd')
   .props({
-    from: types.optional(types.string, ""),
-    to: types.optional(types.string, ""),
-    value: types.optional(types.string, ""),
+    from: types.optional(types.string, ''),
+    to: types.optional(types.string, ''),
+    value: types.optional(types.string, ''),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(params: SendCmdParams) {
       if (!self.is.running) {
         self.from = params.from;
@@ -614,17 +611,17 @@ export interface ISendCmdCmd extends MobxClearInstance<typeof SendCmd> {
   is: ICmdStatus;
 }
 
-export const DepositCmd = CmdBase.named("DepositCmd")
+export const DepositCmd = CmdBase.named('DepositCmd')
   .props({
-    from: types.optional(types.string, ""),
-    to: types.optional(types.string, ""),
-    value: types.optional(types.string, ""),
-    publicSalt: types.optional(types.string, ""),
-    privateSalt: types.optional(types.string, ""),
-    secretHash: types.optional(types.string, ""),
-    message: types.optional(types.string, ""),
+    from: types.optional(types.string, ''),
+    to: types.optional(types.string, ''),
+    value: types.optional(types.string, ''),
+    publicSalt: types.optional(types.string, ''),
+    privateSalt: types.optional(types.string, ''),
+    secretHash: types.optional(types.string, ''),
+    message: types.optional(types.string, ''),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(params: DepositCmdParams) {
       if (!self.is.running) {
         self.from = params.from;
@@ -653,18 +650,18 @@ export interface swapDepositCmdParams {
   message: string;
 }
 
-export const swapDepositCmd = CmdBase.named("swapDepositCmd")
+export const swapDepositCmd = CmdBase.named('swapDepositCmd')
   .props({
-    from: types.optional(types.string, ""),
-    to: types.optional(types.string, ""),
-    value: types.optional(types.string, ""),
-    desiredValue: types.optional(types.string, ""),
-    publicSalt: types.optional(types.string, ""),
-    privateSalt: types.optional(types.string, ""),
-    secretHash: types.optional(types.string, ""),
-    message: types.optional(types.string, ""),
+    from: types.optional(types.string, ''),
+    to: types.optional(types.string, ''),
+    value: types.optional(types.string, ''),
+    desiredValue: types.optional(types.string, ''),
+    publicSalt: types.optional(types.string, ''),
+    privateSalt: types.optional(types.string, ''),
+    secretHash: types.optional(types.string, ''),
+    message: types.optional(types.string, ''),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(params: swapDepositCmdParams) {
       if (!self.is.running) {
         self.from = params.from;
@@ -689,12 +686,12 @@ export interface FetchCmdParams {
   amount: number;
 }
 
-export const FetchCmd = CmdBase.named("FetchCmd")
+export const FetchCmd = CmdBase.named('FetchCmd')
   .props({
-    list: types.optional(types.string, ""),
+    list: types.optional(types.string, ''),
     amount: types.optional(types.number, 0),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(params: FetchCmdParams) {
       if (!self.is.running) {
         self.list = params.list;
@@ -711,11 +708,11 @@ export interface RetrieveCmdParams {
   id: string;
 }
 
-export const RetrieveCmd = CmdBase.named("RetrieveCmd")
+export const RetrieveCmd = CmdBase.named('RetrieveCmd')
   .props({
-    id: types.optional(types.string, ""),
+    id: types.optional(types.string, ''),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(params: RetrieveCmdParams) {
       if (!self.is.running) {
         self.id = params.id;
@@ -732,12 +729,12 @@ export interface CollectCmdParams {
   key: string;
 }
 
-export const CollectCmd = CmdBase.named("CollectCmd")
+export const CollectCmd = CmdBase.named('CollectCmd')
   .props({
-    id: types.optional(types.string, ""),
-    key: types.optional(types.string, ""),
+    id: types.optional(types.string, ''),
+    key: types.optional(types.string, ''),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(params: CollectCmdParams) {
       if (!self.is.running) {
         self.id = params.id;
@@ -752,86 +749,86 @@ export interface ICollectCmd extends MobxClearInstance<typeof CollectCmd> {
 }
 
 export interface IUpdateSwapRateParams {
-  decimals: number
-  inputTokenAddress: string
-  outputTokenAddress: string
+  decimals: number;
+  inputTokenAddress: string;
+  outputTokenAddress: string;
 }
 
 export interface IUpdateSwapCompareCmdParams
   extends Omit<IUpdateSwapRateParams, 'decimals'> {
-  inputAmount: string
+  inputAmount: string;
 }
 
 export const SwapCompareCmd = CmdBase.named('updateSwapCompareCmd')
   .props({
     inputTokenAddress: types.optional(
       types.string,
-      '0x0000000000000000000000000000000000000000'
+      '0x0000000000000000000000000000000000000000',
     ),
     outputTokenAddress: types.optional(
       types.string,
-      '0xB1191F691A355b43542Bea9B8847bc73e7Abb137'
+      '0xB1191F691A355b43542Bea9B8847bc73e7Abb137',
     ),
     inputAmount: types.optional(types.string, '1000000000000000000'),
     uniswapOutputAmount: types.optional(types.string, ''),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(params: IUpdateSwapCompareCmdParams) {
-      if (self.is.running) return
-      self.inputTokenAddress = params.inputTokenAddress
-      self.outputTokenAddress = params.outputTokenAddress
-      self.inputAmount = params.inputAmount
-      self.is.prepared()
+      if (self.is.running) return;
+      self.inputTokenAddress = params.inputTokenAddress;
+      self.outputTokenAddress = params.outputTokenAddress;
+      self.inputAmount = params.inputAmount;
+      self.is.prepared();
     },
     setOutputAmount(outputAmount: string) {
-      self.uniswapOutputAmount = outputAmount
+      self.uniswapOutputAmount = outputAmount;
     },
-  }))
+  }));
 
 export const SwapOutputRateCmd = CmdBase.named('updateSwapCompareCmd')
   .props({
     inputTokenAddress: types.optional(
       types.string,
-      '0x0000000000000000000000000000000000000000'
+      '0x0000000000000000000000000000000000000000',
     ),
     outputTokenAddress: types.optional(
       types.string,
-      '0xB1191F691A355b43542Bea9B8847bc73e7Abb137'
+      '0xB1191F691A355b43542Bea9B8847bc73e7Abb137',
     ),
     inputAmount: types.optional(types.string, ''),
     outputRate: types.optional(types.string, ''),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(params: IUpdateSwapCompareCmdParams) {
       if (!self.is.running) {
-        self.inputTokenAddress = params.inputTokenAddress
-        self.outputTokenAddress = params.outputTokenAddress
-        self.inputAmount = params.inputAmount
+        self.inputTokenAddress = params.inputTokenAddress;
+        self.outputTokenAddress = params.outputTokenAddress;
+        self.inputAmount = params.inputAmount;
 
-        self.is.prepared()
+        self.is.prepared();
       }
     },
     setOutputRate(rate: string) {
-      self.outputRate = rate
+      self.outputRate = rate;
     },
-  }))
+  }));
 
 export const RateCmd = CmdBase.named('usdRateCmd')
   .props({
     symbol: types.optional(types.string, ''),
     rate: types.optional(types.string, ''),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare() {
       if (!self.is.running) {
-        self.is.prepared()
+        self.is.prepared();
       }
     },
-    setRate({ rate, symbol }: { rate: string; symbol: string }) {
-      self.rate = rate
-      self.symbol = symbol
+    setRate({rate, symbol}: {rate: string; symbol: string}) {
+      self.rate = rate;
+      self.symbol = symbol;
     },
-  }))
+  }));
 
 export const SwapRates = types
   .model('SwapRates')
@@ -842,113 +839,98 @@ export const SwapRates = types
     desiredCurrencyUsdRateCmd: types.optional(RateCmd, {}),
     updateCmd: types.optional(CmdBase.named('updateCmd'), {}),
   })
-  .views((self) => ({
+  .views(self => ({
     get compare() {
       return {
         get is() {
-          return createCommand(self.swapCompareCmd.is)
+          return createCommand(self.swapCompareCmd.is);
         },
         run(params: IUpdateSwapCompareCmdParams) {
-          self.swapCompareCmd.prepare(params)
+          self.swapCompareCmd.prepare(params);
         },
         get data() {
-          const {
-            inputAmount,
-            outputTokenAddress,
-            uniswapOutputAmount,
-          } = self.swapCompareCmd
+          const {inputAmount, outputTokenAddress, uniswapOutputAmount} =
+            self.swapCompareCmd;
           const data = {
             inputAmount,
             outputTokenAddress,
             uniswapOutputAmount,
-          }
-          return data
+          };
+          return data;
         },
-      }
+      };
     },
     get rate() {
       return {
         get is() {
-          return createCommand(self.swapOutputRateCmd.is)
+          return createCommand(self.swapOutputRateCmd.is);
         },
         run(params: IUpdateSwapRateParams) {
           self.swapOutputRateCmd.prepare({
             ...params,
             inputAmount: currencyValueToWei(1, params.decimals),
-          })
+          });
         },
         get data() {
-          const { outputRate } = self.swapOutputRateCmd
+          const {outputRate} = self.swapOutputRateCmd;
           const data = {
             outputRate,
-          }
-          return data
+          };
+          return data;
         },
-      }
+      };
     },
     get currencyUsdRate() {
       return {
         get is() {
-          return createCommand(self.currentCurrencyUsdRateCmd.is)
+          return createCommand(self.currentCurrencyUsdRateCmd.is);
         },
         get data() {
-          const { rate, symbol } = self.currentCurrencyUsdRateCmd
-          return { rate, symbol }
+          const {rate, symbol} = self.currentCurrencyUsdRateCmd;
+          return {rate, symbol};
         },
-      }
+      };
     },
     get desiredCurrencyUsdRate() {
       return {
         get is() {
-          return createCommand(self.desiredCurrencyUsdRateCmd.is)
+          return createCommand(self.desiredCurrencyUsdRateCmd.is);
         },
         get data() {
-          const { rate, symbol } = self.desiredCurrencyUsdRateCmd
-          return { rate, symbol }
+          const {rate, symbol} = self.desiredCurrencyUsdRateCmd;
+          return {rate, symbol};
         },
-      }
+      };
     },
   }))
-  .actions((self) => ({
+  .actions(self => ({
     setOutputRate(rate: string) {
-      self.swapOutputRateCmd.setOutputRate(rate)
+      self.swapOutputRateCmd.setOutputRate(rate);
     },
     setOutputAmount(outputAmount: string) {
-      self.swapCompareCmd.setOutputAmount(outputAmount)
+      self.swapCompareCmd.setOutputAmount(outputAmount);
     },
-    setCurrentCurrencyUsdRate({
-      rate,
-      symbol,
-    }: {
-      rate: string
-      symbol: string
-    }) {
-      self.currentCurrencyUsdRateCmd.setRate({ rate, symbol })
+    setCurrentCurrencyUsdRate({rate, symbol}: {rate: string; symbol: string}) {
+      self.currentCurrencyUsdRateCmd.setRate({rate, symbol});
     },
-    setDesiredCurrencyUsdRate({
-      rate,
-      symbol,
-    }: {
-      rate: string
-      symbol: string
-    }) {
-      self.desiredCurrencyUsdRateCmd.setRate({ rate, symbol })
+    setDesiredCurrencyUsdRate({rate, symbol}: {rate: string; symbol: string}) {
+      self.desiredCurrencyUsdRateCmd.setRate({rate, symbol});
     },
-  }))
+  }));
 
 export const Transfers = types
-  .model("Transfers", {
+  .model('Transfers', {
     name: types.string,
     map: types.map(Transfer),
     count: types.optional(types.number, 0),
     fetched: types.optional(types.number, 0),
-    address: types.optional(types.string, ""),
+    address: types.optional(types.string, ''),
     fetchCmd: types.optional(FetchCmd, {}),
     exportCmd: types.optional(FetchCmd, {}),
     lastFetchedBlockNumber: types.optional(types.number, 0),
     firstFetchedBlockNumber: types.optional(types.number, 0),
   })
-  .views((self) => ({
+  .views(self => ({
     get list() {
       return Array.from(self.map.values());
     },
@@ -958,26 +940,26 @@ export const Transfers = types
           return createCommand(self.fetchCmd.is);
         },
         run(amount: number) {
-          self.fetchCmd.prepare({ list: self.name, amount });
+          self.fetchCmd.prepare({list: self.name, amount});
         },
       };
     },
     get export() {
       return {
         get is() {
-          return createCommand(self.exportCmd.is)
+          return createCommand(self.exportCmd.is);
         },
         run() {
-          self.fetchCmd.prepare({ list: self.name, amount: 40 })
+          self.fetchCmd.prepare({list: self.name, amount: 40});
         },
         get progress() {
-          return (self.fetched / self.count) * 100
+          return (self.fetched / self.count) * 100;
         },
-      }
+      };
     },
   }))
-  .actions((self) => ({
-    setName({ name }: { name: string }) {
+  .actions(self => ({
+    setName({name}: {name: string}) {
       self.name = name;
     },
     setCount(count: number) {
@@ -1046,9 +1028,9 @@ export const Transfers = types
       address: string,
       transfer: {
         id: string;
-        state: EthTransferResponseDto["state"];
+        state: EthTransferResponseDto['state'];
         txid?: string;
-      }
+      },
     ) {
       if (!self.address) {
         self.address = address;
@@ -1064,11 +1046,11 @@ export const Transfers = types
     },
     remove(
       address: string,
-      filter: (item: ITransferItem) => boolean
+      filter: (item: ITransferItem) => boolean,
     ): ITransferItem[] {
       const res: ITransferItem[] = [];
       if (self.address === address) {
-        self.map.forEach((transfer) => {
+        self.map.forEach(transfer => {
           if (filter(transfer as ITransferItem)) {
             res.push(castToSnapshot(getSnapshot(transfer)));
             if (self.map.delete(transfer.id)) {
@@ -1084,11 +1066,11 @@ export const Transfers = types
       self.fetched = 0;
       self.count = 0;
       // self.fetchId = self.fetchId + 1
-      self.address = "";
+      self.address = '';
       self.fetchCmd.clear();
     },
   }))
-  .views((self) => ({
+  .views(self => ({
     get list() {
       return (
         values(self.map)
@@ -1105,21 +1087,21 @@ export const Transfers = types
     },
     get activeCount() {
       let count = 0;
-      self.map.forEach((item) => {
-        if (item.state === "new") count += 1;
+      self.map.forEach(item => {
+        if (item.state === 'new') count += 1;
       });
       return count;
     },
   }));
 
 const Mnemonic = types
-  .model("Mnemonic", {
-    data: types.optional(types.string, ""),
-    clearCmd: types.optional(CmdBase.named("ClearCmd"), {}),
-    removeCmd: types.optional(CmdBase.named("RemoveCmd"), {}),
-    restoreCmd: types.optional(CmdBase.named("RestoreCmd"), {}),
+  .model('Mnemonic', {
+    data: types.optional(types.string, ''),
+    clearCmd: types.optional(CmdBase.named('ClearCmd'), {}),
+    removeCmd: types.optional(CmdBase.named('RemoveCmd'), {}),
+    restoreCmd: types.optional(CmdBase.named('RestoreCmd'), {}),
   })
-  .views((self) => ({
+  .views(self => ({
     get clear() {
       return {
         get is() {
@@ -1151,9 +1133,9 @@ const Mnemonic = types
       };
     },
   }))
-  .actions((self) => ({
+  .actions(self => ({
     set(mnemonic?: string) {
-      self.data = mnemonic ? mnemonic : "";
+      self.data = mnemonic ? mnemonic : '';
     },
     clear() {
       self.clearCmd.is.prepared();
@@ -1172,14 +1154,14 @@ export interface IMnemonic extends MobxClearInstance<typeof Mnemonic> {
   restoreCmd: ICmdBase;
 }
 
-const WalletAddressCmd = CmdBase.named("WalletAddressCmd")
+const WalletAddressCmd = CmdBase.named('WalletAddressCmd')
   .props({
-    address: types.optional(types.string, ""),
+    address: types.optional(types.string, ''),
   })
-  .actions((self) => ({
+  .actions(self => ({
     prepare(address?: string) {
       if (self.is.running) return;
-      self.address = address ? address : "";
+      self.address = address ? address : '';
       self.is.prepared();
     },
   }));
@@ -1189,14 +1171,14 @@ export interface IWalletAddressCmd
   is: ICmdStatus;
 }
 const Wallet = types
-  .model("Wallet", {
+  .model('Wallet', {
     mnemonic: types.optional(Mnemonic, {}),
-    activeAccount: types.optional(types.string, ""),
+    activeAccount: types.optional(types.string, ''),
     accounts: types.array(types.string),
     addAddressCmd: types.optional(WalletAddressCmd, {}),
     removeAddressCmd: types.optional(WalletAddressCmd, {}),
   })
-  .views((self) => ({
+  .views(self => ({
     get removeAddress() {
       return {
         get is() {
@@ -1208,17 +1190,17 @@ const Wallet = types
       };
     },
   }))
-  .actions((self) => ({
+  .actions(self => ({
     addWalletAddress() {
       self.addAddressCmd.prepare();
     },
     setAccounts(accounts: string[]) {
-      accounts.forEach((account) => {
+      accounts.forEach(account => {
         self.accounts.push(account);
       });
     },
     setActiveAccount(activeAccount: string | undefined) {
-      self.activeAccount = activeAccount || "";
+      self.activeAccount = activeAccount || '';
     },
     generateMnemonic() {
       self.mnemonic.set(generateMnemonic());
@@ -1243,7 +1225,7 @@ const Wallet = types
     },
   }));
 
-type MobxClearWallet = Omit<Instance<typeof Wallet>, symbol | "accounts">;
+type MobxClearWallet = Omit<Instance<typeof Wallet>, symbol | 'accounts'>;
 
 export interface IWallet extends MobxClearWallet {
   accounts: string[];
@@ -1290,12 +1272,12 @@ const createSecretHash = (passcode: string) => {
   const _privateSalt = new Uint16Array(10);
   window.crypto.getRandomValues(_publicSalt);
   window.crypto.getRandomValues(_privateSalt);
-  const publicSalt = _publicSalt.join("");
-  const privateSalt = _privateSalt.join("");
+  const publicSalt = _publicSalt.join('');
+  const privateSalt = _privateSalt.join('');
   const secretHash = sha3(
-    sha3(privateSalt + sha3(publicSalt + passcode)) || ""
+    sha3(privateSalt + sha3(publicSalt + passcode)) || '',
   );
-  return { privateSalt, publicSalt, secretHash };
+  return {privateSalt, publicSalt, secretHash};
 };
 
 export interface IConnectData {
@@ -1310,47 +1292,47 @@ export interface IRetrieveData {
 }
 
 export const Account = types
-  .model("Account", {
-    allowance: types.optional(types.string, "-1"),
-    address: types.optional(EthAddressPrimitive, ""),
+  .model('Account', {
+    allowance: types.optional(types.string, '-1'),
+    address: types.optional(EthAddressPrimitive, ''),
     wallet: types.optional(Wallet, {}),
     chainId: types.optional(types.number, -1),
     active: types.optional(types.boolean, false),
     block: types.optional(types.number, -1),
-    balance: types.optional(types.string, ""),
-    tokenBalance: types.optional(types.string, ""),
-    stakingBalance: types.optional(types.string, ""),
+    balance: types.optional(types.string, ''),
+    tokenBalance: types.optional(types.string, ''),
+    stakingBalance: types.optional(types.string, ''),
     rate: types.optional(types.number, 0),
-    history: types.optional(Transfers, { name: "history" }),
-    transfers: types.optional(Transfers, { name: "transfers" }),
-    incoming: types.optional(Transfers, { name: "incoming" }),
-    outgoing: types.optional(Transfers, { name: "outgoing" }),
+    history: types.optional(Transfers, {name: 'history'}),
+    transfers: types.optional(Transfers, {name: 'transfers'}),
+    incoming: types.optional(Transfers, {name: 'incoming'}),
+    outgoing: types.optional(Transfers, {name: 'outgoing'}),
     approvedCmd: types.optional(ApprovedCmd, {}),
     depositCmd: types.optional(DepositCmd, {}),
     retrieveCmd: types.optional(RetrieveCmd, {}),
     collectCmd: types.optional(CollectCmd, {}),
     connectCmd: types.optional(ConnectCmd, {}),
     disconnectCmd: types.optional(DisconnectCmd, {}),
-    transactions: types.optional(Transfers, { name: 'transactions' }),
-    exportHistory: types.optional(Transfers, { name: 'history' }),
+    transactions: types.optional(Transfers, {name: 'transactions'}),
+    exportHistory: types.optional(Transfers, {name: 'history'}),
     sendCmd: types.optional(SendCmd, {}),
     safeTransferMap: types.map(SafeTransfer),
     stakingMap: types.map(Staking),
     kiroTokenMap: types.map(KiroToken),
     ERC20TokensMap: types.map(ERC20Tokens),
     currency: types.optional(ERC20Token, {
-      address: "0x000000000000",
-      symbol: "ETH",
+      address: '0x000000000000',
+      symbol: 'ETH',
       decimals: 18,
-      name: "Ethereum",
-      balance: "",
+      name: 'Ethereum',
+      balance: '',
     }),
     desiredCurrency: types.optional(ERC20Token, {
-      address: "0xb1191f691a355b43542bea9b8847bc73e7abb137",
-      symbol: "KIRO",
+      address: '0xb1191f691a355b43542bea9b8847bc73e7abb137',
+      symbol: 'KIRO',
       decimals: 18,
-      name: "Kirobo Token",
-      balance: "",
+      name: 'Kirobo Token',
+      balance: '',
     }),
     deviceInfo: types.optional(DeviceInfo, {}),
     left: types.optional(types.number, 10),
@@ -1362,23 +1344,23 @@ export const Account = types
     swapDepositCmd: types.optional(swapDepositCmd, {}),
     swapRetrieveCmd: types.optional(RetrieveCmd, {}),
     swapCmd: types.optional(CollectCmd, {}),
-    swaps: types.optional(Transfers, { name: "swaps" }),
-    swapperAddress: types.optional(EthAddressPrimitive, ""),
-    swapperBalance: types.optional(types.string, ""),
+    swaps: types.optional(Transfers, {name: 'swaps'}),
+    swapperAddress: types.optional(EthAddressPrimitive, ''),
+    swapperBalance: types.optional(types.string, ''),
     swapRates: types.optional(SwapRates, {}),
-    formType: types.optional(types.string, "swap"),
+    formType: types.optional(types.string, 'swap'),
   })
   /**
    * views
    */
-  .views((self) => ({
+  .views(self => ({
     get retrieve() {
       return {
         get is(): ICommand {
           return createCommand(self.retrieveCmd.is);
         },
-        run({ id }: IRetrieveData) {
-          self.retrieveCmd.prepare({ id: id });
+        run({id}: IRetrieveData) {
+          self.retrieveCmd.prepare({id: id});
         },
         get data(): IRetrieveData {
           return {
@@ -1394,8 +1376,8 @@ export const Account = types
         get is(): ICommand {
           return createCommand(self.swapRetrieveCmd.is);
         },
-        run({ id }: IRetrieveData) {
-          self.swapRetrieveCmd.prepare({ id: id });
+        run({id}: IRetrieveData) {
+          self.swapRetrieveCmd.prepare({id: id});
         },
         get data(): IRetrieveData {
           return {
@@ -1415,16 +1397,15 @@ export const Account = types
           to,
           value,
           passcode,
-          message = "",
+          message = '',
         }: {
           to: string;
           value: string;
           passcode: string;
           message?: string;
         }) {
-          const { secretHash, publicSalt, privateSalt } = createSecretHash(
-            passcode
-          );
+          const {secretHash, publicSalt, privateSalt} =
+            createSecretHash(passcode);
           if (secretHash) {
             self.depositCmd.prepare({
               from: self.address,
@@ -1474,7 +1455,7 @@ export const Account = types
           value,
           desiredValue,
           passcode,
-          message = "",
+          message = '',
         }: {
           to: string;
           value: string;
@@ -1482,9 +1463,8 @@ export const Account = types
           passcode: string;
           message?: string;
         }) {
-          const { secretHash, publicSalt, privateSalt } = createSecretHash(
-            passcode
-          );
+          const {secretHash, publicSalt, privateSalt} =
+            createSecretHash(passcode);
           if (secretHash) {
             self.swapDepositCmd.prepare({
               from: self.address,
@@ -1498,7 +1478,7 @@ export const Account = types
             });
           }
         },
-        get data(): DepositCmdParams & { desiredValue: string } {
+        get data(): DepositCmdParams & {desiredValue: string} {
           return {
             get from() {
               return self.swapDepositCmd.from;
@@ -1533,11 +1513,11 @@ export const Account = types
         get is(): ICommand {
           return createCommand(self.collectCmd.is);
         },
-        run({ id, passcode }: { id: string; passcode: string }) {
+        run({id, passcode}: {id: string; passcode: string}) {
           const item = self.incoming.map.get(id);
           if (item && item.salt) {
-            const key = sha3(item.salt + passcode) || "";
-            self.collectCmd.prepare({ id, key });
+            const key = sha3(item.salt + passcode) || '';
+            self.collectCmd.prepare({id, key});
           }
         },
         get data(): CollectCmdParams {
@@ -1557,11 +1537,11 @@ export const Account = types
         get is(): ICommand {
           return createCommand(self.swapCmd.is);
         },
-        run({ id, passcode }: { id: string; passcode: string }) {
+        run({id, passcode}: {id: string; passcode: string}) {
           const item = self.swaps.map.get(id);
           if (item && item.salt) {
-            const key = sha3(item.salt + passcode) || "";
-            self.swapCmd.prepare({ id, key });
+            const key = sha3(item.salt + passcode) || '';
+            self.swapCmd.prepare({id, key});
           }
         },
         get data(): CollectCmdParams {
@@ -1635,12 +1615,12 @@ export const Account = types
     get ERC20TokensContract() {
       return (
         self.ERC20TokensMap.get(
-          getChainName(self.chainId > 0 ? self.chainId : 1)
+          getChainName(self.chainId > 0 ? self.chainId : 1),
         )?.list || []
       );
     },
     get ERC20TokensMainContract() {
-      return self.ERC20TokensMap.get(getChainName(1))?.list || []
+      return self.ERC20TokensMap.get(getChainName(1))?.list || [];
     },
     get stakingContract() {
       return self.stakingMap.get(getChainName(self.chainId));
@@ -1648,51 +1628,51 @@ export const Account = types
     get gasPrice() {
       return (
         self.gasPriceMap.get(
-          getChainName(self.chainId > 0 ? self.chainId : 1)
-        ) || ""
+          getChainName(self.chainId > 0 ? self.chainId : 1),
+        ) || ''
       );
     },
     approvedToken(symbol: string, amount: string) {
-      const { toBN } = Web3.utils;
+      const {toBN} = Web3.utils;
       const isApproved = !(
-        symbol !== "ETH" && toBN(self.allowance).cmp(toBN(amount)) === -1
+        symbol !== 'ETH' && toBN(self.allowance).cmp(toBN(amount)) === -1
       );
       // if (isApproved && self.approvedCmd.is.running) self.approvedCmd.done()
       return isApproved;
     },
     transferFees(amount: string) {
       const contract =
-        self.formType !== "swap"
+        self.formType !== 'swap'
           ? self.safeTransferMap.get(
-              getChainName(self.chainId > 0 ? self.chainId : 1)
+              getChainName(self.chainId > 0 ? self.chainId : 1),
             )
           : self.safeSwapMap.get(
-              getChainName(self.chainId > 0 ? self.chainId : 1)
+              getChainName(self.chainId > 0 ? self.chainId : 1),
             );
-      if (contract) return contract.fees(parseFloat(amount) > 0 ? amount : "0");
-      return "";
+      if (contract) return contract.fees(parseFloat(amount) > 0 ? amount : '0');
+      return '';
     },
     transferReward(amount: string, fees: string) {
       const contract =
-        self.formType !== "swap"
+        self.formType !== 'swap'
           ? self.safeTransferMap.get(
-              getChainName(self.chainId > 0 ? self.chainId : 1)
+              getChainName(self.chainId > 0 ? self.chainId : 1),
             )
           : self.safeSwapMap.get(
-              getChainName(self.chainId > 0 ? self.chainId : 1)
+              getChainName(self.chainId > 0 ? self.chainId : 1),
             );
       if (contract) {
         if (self.left <= 0) return 0;
         return (
           self.factor *
           +contract.reward(
-            parseFloat(amount) ? amount : "0",
-            self.stakingBalance || "0",
-            parseFloat(fees) ? fees : "0"
+            parseFloat(amount) ? amount : '0',
+            self.stakingBalance || '0',
+            parseFloat(fees) ? fees : '0',
           )
         );
       }
-      return "";
+      return '';
     },
     ERC20TokenList(chainName: string) {
       const tokens = self.ERC20TokensMap.get(chainName);
@@ -1702,7 +1682,7 @@ export const Account = types
   /**
    * actions
    */
-  .actions((self) => ({
+  .actions(self => ({
     setCanGetRewards(canGetRewards: boolean) {
       self.canGetRewards = canGetRewards;
     },
@@ -1736,17 +1716,17 @@ export const Account = types
     setCurrency(currency: ERC20TokenItem) {
       self.currency.setData(currency);
       const token = self.ERC20TokensContract.find(
-        (token) => token?.symbol === self.desiredCurrency?.symbol
+        token => token?.symbol === self.desiredCurrency?.symbol,
       );
       if (token?.symbol === currency.symbol) {
-        if (currency.symbol !== "ETH") {
+        if (currency.symbol !== 'ETH') {
           const ethToken = self.ERC20TokensContract.find(
-            (token) => token?.symbol === "ETH"
+            token => token?.symbol === 'ETH',
           );
           if (ethToken) self.desiredCurrency.setData(ethToken);
         } else {
           const kiroToken = self.ERC20TokensContract.find(
-            (token) => token?.symbol === "KIRO"
+            token => token?.symbol === 'KIRO',
           );
           if (kiroToken) self.desiredCurrency.setData(kiroToken);
         }
@@ -1755,17 +1735,17 @@ export const Account = types
     setDesiredCurrency(currency: ERC20TokenItem) {
       self.desiredCurrency.setData(currency);
       const token = self.ERC20TokensContract.find(
-        (token) => token?.symbol === self.currency?.symbol
+        token => token?.symbol === self.currency?.symbol,
       );
       if (token?.symbol === currency.symbol) {
-        if (currency.symbol !== "ETH") {
+        if (currency.symbol !== 'ETH') {
           const ethToken = self.ERC20TokensContract.find(
-            (token) => token?.symbol === "ETH"
+            token => token?.symbol === 'ETH',
           );
           if (ethToken) self.currency.setData(ethToken);
         } else {
           const kiroToken = self.ERC20TokensContract.find(
-            (token) => token?.symbol === "KIRO"
+            token => token?.symbol === 'KIRO',
           );
           if (kiroToken) self.currency.setData(kiroToken);
         }
@@ -1788,14 +1768,14 @@ export const Account = types
         self.safeTransferMap.set(chainName, SafeTransfer.create());
       }
       const {
-        address = "",
-        feesFormula = "",
-        rewardFormula = "",
+        address = '',
+        feesFormula = '',
+        rewardFormula = '',
         synced = false,
       } = data;
       self.safeTransferMap
         .get(chainName)
-        ?.setData({ address, feesFormula, rewardFormula, synced });
+        ?.setData({address, feesFormula, rewardFormula, synced});
     },
     setSafeSwapContract(chainName: string, data: ISafeTransferItem) {
       if (!chainName || !data) return;
@@ -1803,35 +1783,35 @@ export const Account = types
         self.safeSwapMap.set(chainName, SafeTransfer.create());
       }
       const {
-        address = "",
-        feesFormula = "",
-        rewardFormula = "",
+        address = '',
+        feesFormula = '',
+        rewardFormula = '',
         synced = false,
       } = data;
       self.safeSwapMap
         .get(chainName)
-        ?.setData({ address, feesFormula, rewardFormula, synced });
+        ?.setData({address, feesFormula, rewardFormula, synced});
     },
     setStakingContract(chainName: string, data: IStakingItem) {
       if (!chainName || !data) return;
       if (!self.stakingMap.has(chainName)) {
         self.stakingMap.set(chainName, Staking.create());
       }
-      const { address = "" } = data;
-      self.stakingMap.get(chainName)?.setData({ address });
+      const {address = ''} = data;
+      self.stakingMap.get(chainName)?.setData({address});
     },
     setKiroTokenContract(chainName: string, data: IKiroTokenItem) {
       if (!chainName || !data) return;
       if (!self.kiroTokenMap.has(chainName)) {
         self.kiroTokenMap.set(chainName, KiroToken.create());
       }
-      const { address = "" } = data;
-      self.kiroTokenMap.get(chainName)?.setData({ address });
+      const {address = ''} = data;
+      self.kiroTokenMap.get(chainName)?.setData({address});
     },
     setERC20TokenContract(chainName: string, data: Array<ERC20TokenItem>) {
       if (!chainName || !data) return;
       self.ERC20TokensMap.set(chainName, {});
-      for (const { address, name, symbol, decimals, balance, rate } of data) {
+      for (const {address, name, symbol, decimals, balance, rate} of data) {
         self.ERC20TokensMap.get(chainName)?.addToken({
           address,
           name,
@@ -1851,7 +1831,7 @@ export const Account = types
     clearERC20TokenBalances(chainName?: string) {
       chainName
         ? self.ERC20TokensMap.get(chainName)?.clearBalances()
-        : self.ERC20TokensMap.forEach((token) => token.clearBalances());
+        : self.ERC20TokensMap.forEach(token => token.clearBalances());
     },
     setRewardsParams(factor: number, left: number) {
       self.factor = factor;
@@ -1876,14 +1856,14 @@ export const accountStore = Account.create() as unknown as IAccount;
 type MobxClearAccount = Omit<
   Instance<typeof Account>,
   | symbol
-  | "currency"
-  | "desiredCurrency"
-  | "wallet"
-  | "deviceInfo"
-  | "ERC20TokensMap"
-  | "safeTransferMap"
-  | "kiroTokenMap"
-  | "stakingMap"
+  | 'currency'
+  | 'desiredCurrency'
+  | 'wallet'
+  | 'deviceInfo'
+  | 'ERC20TokensMap'
+  | 'safeTransferMap'
+  | 'kiroTokenMap'
+  | 'stakingMap'
   | keyof ICommands
   | keyof ILists
   | keyof IViews
@@ -1931,7 +1911,7 @@ export interface IAccount extends MobxClearAccount, ILists, ICommands, IViews {
 
 type MobxClearTransferItems = Omit<
   Instance<typeof Transfers>,
-  symbol | "list" | "fetchCmd" | "map"
+  symbol | 'list' | 'fetchCmd' | 'map'
 >;
 export interface ITransferItems extends MobxClearTransferItems {
   list: ITransfer[];
