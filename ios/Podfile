@@ -14,6 +14,8 @@ target 'web3Native' do
 
   pod 'react-native-randombytes', :path => '../node_modules/react-native-randombytes'
 
+  pod 'RNSecureRandom', :path => '../node_modules/react-native-securerandom'
+
   target 'web3NativeTests' do
     inherit! :complete
     # Pods for testing

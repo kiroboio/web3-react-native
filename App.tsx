@@ -8,12 +8,12 @@
  * @format
  */
 import React from 'react';
-import {SafeAreaView, StatusBar, Text, useColorScheme} from 'react-native';
-import './shim';
+import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
+import expandGlobal from './expandGlobal';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import Web3 from 'web3';
 import {App as SrcApp} from './src/App';
 
+expandGlobal();
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -21,34 +21,10 @@ const App = () => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  console.log({test: 'test', web3: new Web3()});
+  console.log({ global })
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      {/* <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView> */}
       <SrcApp />
     </SafeAreaView>
   );

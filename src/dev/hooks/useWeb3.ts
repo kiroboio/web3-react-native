@@ -69,8 +69,8 @@ export const useWeb3 = (): IWeb3ReactContext => {
   const [chainId, setChainId] = useState<number>(-1);
   const [library, setLibrary] = useState<Web3>(new Web3());
   const RPC_URLS: {[chainId: number]: string} = {
-    1: `https://mainnet.infura.io/v3/14c73ecdbcaa464585aa7c438fdf6a77`,
-    4: `https://rinkeby.infura.io/v3/14c73ecdbcaa464585aa7c438fdf6a77`,
+    1: `https://mainnet.infura.io/v3/`,
+    4: `https://rinkeby.infura.io/v3/`,
   };
 
   // const inAppWalletConnect = () => {
@@ -139,11 +139,10 @@ export const useWeb3 = (): IWeb3ReactContext => {
     connectorName: Connectors,
     params: IConnectParams = {},
   ) => {
-    console.log({connectorName, params, connectors});
     const {web3, addresses} = InAppWalletConnector.getWeb3({
       urls: {4: RPC_URLS[4]},
       defaultChainId: 4,
-      privateKey: '0x9be9b846aba3093b8d5898d796bc8ac74af918120a23304ecf21a5fa22003082',
+      privateKey: '',
     });
 
     console.log('connect wallet');
