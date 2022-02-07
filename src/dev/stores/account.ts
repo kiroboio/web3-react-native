@@ -289,21 +289,25 @@ export interface ICmdBase extends MobxClearInstance<typeof CmdBase> {
   is: ICmdStatus;
 }
 
+export type ConnectParams = { key?: string, chainId?: 1 | 4}
 export const ConnectCmd = CmdBase.named('ConnectCmd')
   .props({
-    connector: types.optional(types.string, ''),
+    key: types.optional(types.string, ''),
+    chainId: types.optional(types.number, 1),
     isConnected: types.optional(types.boolean, false),
   })
   .actions(self => ({
-    prepare(connector: Connectors | undefined) {
-      if (!connector) {
+    prepare({key, chainId }: ConnectParams) {
+      if (!key) {
         self.isConnected = false;
-        self.connector = '';
+        self.key = '';
+        self.chainId = -1;
         return;
       }
       if (!self.is.running) {
         self.isConnected = true;
-        self.connector = connector;
+        self.key = key;
+        self.chainId = chainId || 1;
         self.is.prepared();
       }
     },
@@ -1577,8 +1581,8 @@ export const Account = types
         get is(): ICommand {
           return createCommand(self.connectCmd.is);
         },
-        run(connector: Connectors) {
-          self.connectCmd.prepare(connector);
+        run(params: ConnectParams) {
+          self.connectCmd.prepare(params);
         },
         get data(): IConnectData {
           return {
@@ -1586,7 +1590,7 @@ export const Account = types
               return self.connectCmd.isConnected;
             },
             get connector() {
-              return self.connectCmd.connector as Connectors;
+              return "InAppWallet" as Connectors;
             },
           };
         },

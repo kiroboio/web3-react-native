@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Web3 from 'web3';
-import {toChecksumAddress} from 'web3-utils';
-import {toBN} from 'web3-utils';
-import {useAccount} from '../context/account';
-import {useWeb3, Connectors} from '../hooks/useWeb3';
+import { toChecksumAddress } from 'web3-utils';
+import { toBN } from 'web3-utils';
+import { useAccount } from '../context/account';
+import { useWeb3, Connectors } from '../hooks/useWeb3';
 import KiroboService from '@kiroboio/safe-transfer-lib';
-import {observer} from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
 import {
   ERC20TokenItem,
   ITransferItem,
@@ -21,13 +21,13 @@ import {
   EthTokenInfo,
   EthTransferResponseDto,
 } from '../dto/EthTransfersDto';
-import {EthErc20ResponseDto} from '../dto/EthErc20Dto';
-import {useWallet} from '../hooks/useWallet';
+import { EthErc20ResponseDto } from '../dto/EthErc20Dto';
+import { useWallet } from '../hooks/useWallet';
 import '@metamask/detect-provider';
-import {InAppWalletConnector} from '../customConnectors/InAppWalletConnector';
-import {useSwapRates} from '../hooks/useSwapRates';
-import {wait} from '../utils/wait';
-import axios, {AxiosResponse} from 'axios';
+import { InAppWalletConnector } from '../customConnectors/InAppWalletConnector';
+import { useSwapRates } from '../hooks/useSwapRates';
+import { wait } from '../utils/wait';
+import axios, { AxiosResponse } from 'axios';
 
 const MAX_CONFIRMS = 30;
 const SERVICE = {
@@ -123,12 +123,12 @@ const responseToTransferItem = (
     item.state === 'new'
       ? item.deposit.confirmed
       : item.state === 'collected'
-      ? item.collect.confirmed
-      : item.state === 'retrieved'
-      ? item.retrieve.confirmed
-      : item.state === 'swapped'
-      ? item.swap.confirmed
-      : -1;
+        ? item.collect.confirmed
+        : item.state === 'retrieved'
+          ? item.retrieve.confirmed
+          : item.state === 'swapped'
+            ? item.swap.confirmed
+            : -1;
 
   const txid =
     item.swap?.txid ||
@@ -175,15 +175,15 @@ const responseToTransactionItem = (
   };
 };
 
-const moveToStore = ({store, address, item}: MoveToStoreParams) => {
+const moveToStore = ({ store, address, item }: MoveToStoreParams) => {
   store.upsert(address, item);
 };
 
-const putInStore = ({store, address, item}: PutInStoreParams) => {
+const putInStore = ({ store, address, item }: PutInStoreParams) => {
   store.upsert(address, responseToTransferItem(item));
 };
 
-const addToStore = ({store, address, items, count}: AddToStoreParams) => {
+const addToStore = ({ store, address, items, count }: AddToStoreParams) => {
   store.add({
     address,
     count,
@@ -241,11 +241,11 @@ const inboxQuery = ({
     ],
   },
   $or: [
-    {'collect.confirmed': -1, 'retrieve.confirmed': -1},
-    {'collect.confirmed': {$gt: thresholdBlock}},
-    {'retrieve.confirmed': {$gt: thresholdBlock}},
+    { 'collect.confirmed': -1, 'retrieve.confirmed': -1 },
+    { 'collect.confirmed': { $gt: thresholdBlock } },
+    { 'retrieve.confirmed': { $gt: thresholdBlock } },
   ],
-  $sort: {updatedAt: -1},
+  $sort: { updatedAt: -1 },
   $skip,
   $limit,
   watch,
@@ -272,11 +272,11 @@ const outboxQuery = ({
     ],
   },
   $or: [
-    {'collect.confirmed': -1, 'retrieve.confirmed': -1},
-    {'collect.confirmed': {$gt: thresholdBlock}},
-    {'retrieve.confirmed': {$gt: thresholdBlock}},
+    { 'collect.confirmed': -1, 'retrieve.confirmed': -1 },
+    { 'collect.confirmed': { $gt: thresholdBlock } },
+    { 'retrieve.confirmed': { $gt: thresholdBlock } },
   ],
-  $sort: {updatedAt: -1},
+  $sort: { updatedAt: -1 },
   $skip,
   $limit,
   watch,
@@ -303,11 +303,11 @@ const transfersQuery = ({
     ],
   },
   $or: [
-    {'collect.confirmed': -1, 'retrieve.confirmed': -1},
-    {'collect.confirmed': {$gt: thresholdBlock}},
-    {'retrieve.confirmed': {$gt: thresholdBlock}},
+    { 'collect.confirmed': -1, 'retrieve.confirmed': -1 },
+    { 'collect.confirmed': { $gt: thresholdBlock } },
+    { 'retrieve.confirmed': { $gt: thresholdBlock } },
   ],
-  $sort: {updatedAt: -1},
+  $sort: { updatedAt: -1 },
   $skip,
   $limit,
   watch,
@@ -334,11 +334,11 @@ const swapsQuery = ({
     ],
   },
   $or: [
-    {'swap.confirmed': -1, 'retrieve.confirmed': -1},
-    {'swap.confirmed': {$gt: thresholdBlock}},
-    {'retrieve.confirmed': {$gt: thresholdBlock}},
+    { 'swap.confirmed': -1, 'retrieve.confirmed': -1 },
+    { 'swap.confirmed': { $gt: thresholdBlock } },
+    { 'retrieve.confirmed': { $gt: thresholdBlock } },
   ],
-  $sort: {updatedAt: -1},
+  $sort: { updatedAt: -1 },
   $skip,
   $limit,
   watch,
@@ -353,11 +353,11 @@ const historyQuery = ({
 }: FetchQueryParams) => ({
   address,
   $or: [
-    {'collect.confirmed': {$gt: -1, $lte: thresholdBlock}},
-    {'retrieve.confirmed': {$gt: -1, $lte: thresholdBlock}},
-    {'swap.confirmed': {$gt: -1, $lte: thresholdBlock}},
+    { 'collect.confirmed': { $gt: -1, $lte: thresholdBlock } },
+    { 'retrieve.confirmed': { $gt: -1, $lte: thresholdBlock } },
+    { 'swap.confirmed': { $gt: -1, $lte: thresholdBlock } },
   ],
-  $sort: {updatedAt: -1},
+  $sort: { updatedAt: -1 },
   $skip,
   $limit,
   watch,
@@ -375,16 +375,16 @@ interface RemoveFromStoreParams {
   filter: (item: ITransferItem) => boolean;
 }
 
-const deleteFromStore = ({store, address, id}: DeleteFromStoreParams) => {
+const deleteFromStore = ({ store, address, id }: DeleteFromStoreParams) => {
   store.delete(address, id);
 };
 
-const removeFromStore = ({store, address, filter}: RemoveFromStoreParams) => {
+const removeFromStore = ({ store, address, filter }: RemoveFromStoreParams) => {
   return store.remove(address, filter);
 };
 
 const AMOUNT_OF_TRANSACTIONS_UPPER_THRESHOLD = 99999999;
-export const Web3ProviderUpdater: React.FC = observer(({children}) => {
+export const Web3ProviderUpdater: React.FC = observer(({ children }) => {
   const {
     connect: web3Connect,
     disconnect: web3Disconnect,
@@ -454,7 +454,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
     ERC20TokenList,
   } = useAccount();
 
-  const {setNewMnemonic, generateNewMnemonic, setActiveAccount} = useWallet();
+  const { setNewMnemonic, generateNewMnemonic, setActiveAccount } = useWallet();
 
   useSwapRates();
 
@@ -500,7 +500,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
       thresholdBlock,
       watch = 'ignore',
     }: FetchNextTransferParams) => {
-      const fetchTransfers = ({store, query}: FetchTransferParams) => {
+      const fetchTransfers = ({ store, query }: FetchTransferParams) => {
         const service = KiroboService.getInstance();
         if (!service) {
           store.fetchCmd.done();
@@ -510,7 +510,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
         if (network && block) {
           service
             ?.getService(SERVICE.TRANSFERS(network))
-            .find({query})
+            .find({ query })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .then((payload: any) => {
               store.fetchCmd.done();
@@ -712,16 +712,16 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
 
               const itemsToAdd = items
                 ? items
-                    .filter(item => item.isError === '0' || !item.isError) // failed transaction: revert, assert, etc.
-                    .filter(item => item.to !== '') // create contract transaction
-                    .filter(
-                      item => Boolean(item.value) && Number(item.value) > 0,
-                    ) // create contract transaction
-                    .filter(
-                      item =>
-                        !KIROBO_CONTRACTS[item.from] &&
-                        !KIROBO_CONTRACTS[item.to],
-                    )
+                  .filter(item => item.isError === '0' || !item.isError) // failed transaction: revert, assert, etc.
+                  .filter(item => item.to !== '') // create contract transaction
+                  .filter(
+                    item => Boolean(item.value) && Number(item.value) > 0,
+                  ) // create contract transaction
+                  .filter(
+                    item =>
+                      !KIROBO_CONTRACTS[item.from] &&
+                      !KIROBO_CONTRACTS[item.to],
+                  )
                 : []; // safeTransfer & safeSwap contracts interaction
               // .filter(
               //   (item) =>
@@ -734,7 +734,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
                 item.token = {
                   address:
                     tokens[item.tokenSymbol as keyof typeof tokens].address[
-                      chainId.toString() as '1' | '4'
+                    chainId.toString() as '1' | '4'
                     ] || '',
                   symbol: item.tokenSymbol || '',
                   decimals: Number(item.tokenDecimal) || 18,
@@ -764,8 +764,8 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             store.fetchCmd.done();
           }
         } catch (e) {
-          const error = e as {message: string; reason: string};
-          store.fetchCmd.failed({message: error.message || error.reason});
+          const error = e as { message: string; reason: string };
+          store.fetchCmd.failed({ message: error.message || error.reason });
         }
       };
 
@@ -949,7 +949,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
       wallet.addAddressCmd.done();
     } catch (e) {
       const err = e as any;
-      wallet.addAddressCmd.failed({message: err.message || err.reason});
+      wallet.addAddressCmd.failed({ message: err.message || err.reason });
     }
   }, [wallet.addAddressCmd.is.ready]);
 
@@ -965,7 +965,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
       wallet.removeAddressCmd.done();
     } catch (e) {
       const err = e as any;
-      wallet.removeAddressCmd.failed({message: err.message || err.reason});
+      wallet.removeAddressCmd.failed({ message: err.message || err.reason });
     }
   }, [wallet.removeAddressCmd.is.ready]);
 
@@ -990,7 +990,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
     } catch (e) {
       const err = e as any;
 
-      wallet.mnemonic.restoreCmd.failed({message: err.message || err.reason});
+      wallet.mnemonic.restoreCmd.failed({ message: err.message || err.reason });
     }
   }, [wallet.mnemonic.restoreCmd.is.ready]);
 
@@ -1004,14 +1004,8 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
     const connectCmd = __connectCmd.current;
     const web3 = __web3.current;
 
-    if (connectCmd.connector !== Connectors.InAppWallet) return;
-    if (!wallet.mnemonic.data) return;
     if (prevMnemonic && prevMnemonic === wallet.mnemonic.data) return;
     const accounts = new Set();
-    console.log(
-      web3.eth.accounts.wallet,
-      'mnemonic wallet web3.eth.accounts.wallet',
-    );
     Object.keys(web3.eth.accounts.wallet).forEach(key => {
       if (!web3.eth.accounts.wallet[parseInt(key)]?.address) return;
       accounts.add(web3.eth.accounts.wallet[parseInt(key)].address);
@@ -1121,7 +1115,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
         try {
           const service = KiroboService.getInstance();
           const network = getChainName(chainId);
-          const {amount} = approvedCmd;
+          const { amount } = approvedCmd;
           if (!service) throw new Error('service not started');
           if (!active) throw new Error('web3 not connected');
           if (!network) throw new Error('chain is not supported');
@@ -1135,7 +1129,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             gas = toBN(
               await erc20TokenContractWeb3.methods
                 .approve(approvedCmd.contractAddress, web3.utils.toBN(amount))
-                .estimateGas({from: address}),
+                .estimateGas({ from: address }),
             )
               .mul(toBN(11))
               .div(toBN(10))
@@ -1146,7 +1140,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
 
           const approve = await erc20TokenContractWeb3.methods
             .approve(approvedCmd.contractAddress, web3.utils.toBN(amount))
-            .send({from: address, gasPrice, gas});
+            .send({ from: address, gasPrice, gas });
 
           if (approve) {
             const allowance = await erc20TokenContractWeb3.methods
@@ -1158,7 +1152,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
         } catch (e) {
           const err = e as any;
 
-          approvedCmd.failed({message: err.message || err.reason});
+          approvedCmd.failed({ message: err.message || err.reason });
         }
       })();
     }
@@ -1176,7 +1170,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
       sendCmd.start();
       (async function runSendCmd() {
         try {
-          const {from, to, value} = sendCmd;
+          const { from, to, value } = sendCmd;
 
           const network = getChainName(chainId);
           const gasPrice = gasPriceMap.get(network);
@@ -1201,7 +1195,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             }
             await erc20TokenContractWeb3.methods
               .transfer(to, value)
-              .send({from: address, gasPrice, gas});
+              .send({ from: address, gasPrice, gas });
           } else {
             const res = await web3.eth.sendTransaction({
               value,
@@ -1235,7 +1229,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
           const err = e as any;
           console.error(`err = ${JSON.stringify(err.message)}`);
 
-          sendCmd.failed({message: err.message});
+          sendCmd.failed({ message: err.message });
         }
       })();
     }
@@ -1312,18 +1306,18 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             gas = toBN(
               currency.symbol !== 'ETH'
                 ? await safeTransferContractWeb3.methods
-                    .depositERC20(
-                      currency.address,
-                      currency.symbol,
-                      to,
-                      value,
-                      request.fees,
-                      secretHash,
-                    )
-                    .estimateGas({from: address, value: request.fees})
+                  .depositERC20(
+                    currency.address,
+                    currency.symbol,
+                    to,
+                    value,
+                    request.fees,
+                    secretHash,
+                  )
+                  .estimateGas({ from: address, value: request.fees })
                 : await safeTransferContractWeb3.methods
-                    .deposit(to, value, request.fees, secretHash)
-                    .estimateGas({from: address, value: total}),
+                  .deposit(to, value, request.fees, secretHash)
+                  .estimateGas({ from: address, value: total }),
             )
               .mul(toBN(11))
               .div(toBN(10))
@@ -1338,41 +1332,17 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             gas,
           };
 
-          if (connectCmd.connector === Connectors.InAppWallet) {
-            sendPayload.nonce = await __web3.current.eth.getTransactionCount(
-              address,
-              'pending',
-            );
-          }
+
+          sendPayload.nonce = await __web3.current.eth.getTransactionCount(
+            address,
+            'pending',
+          );
+
 
           const txid =
             currency.symbol !== 'ETH'
               ? await new Promise((resolve, reject) => {
-                  safeTransferContractWeb3.methods
-                    .depositERC20(
-                      currency.address,
-                      currency.symbol,
-                      to,
-                      value,
-                      request.fees,
-                      secretHash,
-                    )
-                    .send({...sendPayload, value: request.fees})
-                    .on('transactionHash', (hash: string) => resolve(hash))
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .on('error', (err: any) => reject(err));
-                })
-              : await new Promise((resolve, reject) => {
-                  safeTransferContractWeb3.methods
-                    .deposit(to, value, request.fees, secretHash)
-                    .send({...sendPayload, value: total})
-                    .on('transactionHash', (hash: string) => resolve(hash))
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .on('error', (err: any) => reject(err));
-                });
-          const hex =
-            currency.symbol !== 'ETH'
-              ? safeTransferContractWeb3.methods
+                safeTransferContractWeb3.methods
                   .depositERC20(
                     currency.address,
                     currency.symbol,
@@ -1381,10 +1351,34 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
                     request.fees,
                     secretHash,
                   )
-                  .encodeABI()
-              : safeTransferContractWeb3.methods
+                  .send({ ...sendPayload, value: request.fees })
+                  .on('transactionHash', (hash: string) => resolve(hash))
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  .on('error', (err: any) => reject(err));
+              })
+              : await new Promise((resolve, reject) => {
+                safeTransferContractWeb3.methods
                   .deposit(to, value, request.fees, secretHash)
-                  .encodeABI();
+                  .send({ ...sendPayload, value: total })
+                  .on('transactionHash', (hash: string) => resolve(hash))
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  .on('error', (err: any) => reject(err));
+              });
+          const hex =
+            currency.symbol !== 'ETH'
+              ? safeTransferContractWeb3.methods
+                .depositERC20(
+                  currency.address,
+                  currency.symbol,
+                  to,
+                  value,
+                  request.fees,
+                  secretHash,
+                )
+                .encodeABI()
+              : safeTransferContractWeb3.methods
+                .deposit(to, value, request.fees, secretHash)
+                .encodeABI();
 
           await service.getService(SERVICE.FOLLOW(network)).create({
             txid,
@@ -1393,11 +1387,11 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
 
           const item = {
             ...request,
-            collect: {broadcasted: -1, confirmed: -1, txid: ''},
-            deposit: {txid, broadcasted: -1, confirmed: -1},
-            expires: {at: request.expiresAt},
+            collect: { broadcasted: -1, confirmed: -1, txid: '' },
+            deposit: { txid, broadcasted: -1, confirmed: -1 },
+            expires: { at: request.expiresAt },
             state: 'creating',
-            retrieve: {broadcasted: -1, confirmed: -1, txid: ''},
+            retrieve: { broadcasted: -1, confirmed: -1, txid: '' },
             message,
             txid,
             salt: request.publicSalt,
@@ -1405,11 +1399,11 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             token:
               currency.symbol !== 'ETH'
                 ? {
-                    address: currency.address,
-                    decimals: currency.decimals,
-                    symbol: currency.symbol,
-                    type: 'ERC20',
-                  }
+                  address: currency.address,
+                  decimals: currency.decimals,
+                  symbol: currency.symbol,
+                  type: 'ERC20',
+                }
                 : undefined,
           };
           depositCmd.done();
@@ -1428,9 +1422,8 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
           const err = e as any;
 
           depositCmd.failed({
-            message: `${err.message || err.reason} ${currency?.symbol} ${
-              safeTransferContractWeb3.methods
-            }`,
+            message: `${err.message || err.reason} ${currency?.symbol} ${safeTransferContractWeb3.methods
+              }`,
           });
         }
       })();
@@ -1536,7 +1529,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
                   request.swap.fees,
                   secretHash,
                 )
-                .estimateGas({from: address, value: sendValue}),
+                .estimateGas({ from: address, value: sendValue }),
             )
               .mul(toBN(11))
               .div(toBN(10))
@@ -1552,12 +1545,11 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             value: sendValue,
           };
 
-          if (connectCmd.connector !== Connectors.InAppWallet) {
-            sendPayload.nonce = await __web3.current.eth.getTransactionCount(
-              address,
-              'pending',
-            );
-          }
+          sendPayload.nonce = await __web3.current.eth.getTransactionCount(
+            address,
+            'pending',
+          );
+
 
           const txid: string = await new Promise((resolve, reject) => {
             safeSwapContractWeb3.methods
@@ -1602,12 +1594,12 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             address,
             item: {
               ...request,
-              collect: {broadcasted: -1, confirmed: -1, txid: ''},
-              deposit: {txid, broadcasted: -1, confirmed: -1},
-              swap: {txid: '', broadcasted: -1, confirmed: -1},
-              expires: {at: request.expiresAt},
+              collect: { broadcasted: -1, confirmed: -1, txid: '' },
+              deposit: { txid, broadcasted: -1, confirmed: -1 },
+              swap: { txid: '', broadcasted: -1, confirmed: -1 },
+              expires: { at: request.expiresAt },
               state: 'creating',
-              retrieve: {broadcasted: -1, confirmed: -1, txid: ''},
+              retrieve: { broadcasted: -1, confirmed: -1, txid: '' },
               message,
               txid,
               salt: request.publicSalt,
@@ -1615,11 +1607,11 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
               token:
                 currency.symbol !== 'ETH'
                   ? {
-                      address: currency.address,
-                      decimals: currency.decimals,
-                      symbol: currency.symbol,
-                      type: 'ERC20',
-                    }
+                    address: currency.address,
+                    decimals: currency.decimals,
+                    symbol: currency.symbol,
+                    type: 'ERC20',
+                  }
                   : undefined,
               interchange: {
                 value: desiredValue,
@@ -1637,7 +1629,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
           console.error('fees: error swapDepositCmd', 4, e);
           const err = e as any;
 
-          swapDepositCmd.failed({message: err.message || err.reason});
+          swapDepositCmd.failed({ message: err.message || err.reason });
         }
       })();
     }
@@ -1666,7 +1658,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
           const transfer = transfers.map.get(retrieveCmd.id);
           if (!transfer) throw new Error('transfer not found');
 
-          const {from, to, fees, value, secretHash, token} = transfer;
+          const { from, to, fees, value, secretHash, token } = transfer;
           if (from !== address)
             throw new Error('from address does not match connected address');
           const gasPrice = gasPriceMap.get(network);
@@ -1676,18 +1668,18 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             gas = toBN(
               token.symbol && token.symbol !== 'ETH'
                 ? await safeTransferContractWeb3.methods
-                    .retrieveERC20(
-                      token.address,
-                      token.symbol,
-                      to,
-                      value,
-                      fees,
-                      secretHash,
-                    )
-                    .estimateGas({from: address})
+                  .retrieveERC20(
+                    token.address,
+                    token.symbol,
+                    to,
+                    value,
+                    fees,
+                    secretHash,
+                  )
+                  .estimateGas({ from: address })
                 : await safeTransferContractWeb3.methods
-                    .retrieve(to, value, fees, secretHash)
-                    .estimateGas({from: address}),
+                  .retrieve(to, value, fees, secretHash)
+                  .estimateGas({ from: address }),
             )
               .mul(toBN(11))
               .div(toBN(10))
@@ -1702,41 +1694,16 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             gas,
           };
 
-          if (connectCmd.connector !== Connectors.InAppWallet) {
-            sendPayload.nonce = await __web3.current.eth.getTransactionCount(
-              address,
-              'pending',
-            );
-          }
+
+          sendPayload.nonce = await __web3.current.eth.getTransactionCount(
+            address,
+            'pending',
+          );
+
           const txid =
             token.symbol && token.symbol !== 'ETH'
               ? await new Promise((resolve, reject) => {
-                  safeTransferContractWeb3.methods
-                    .retrieveERC20(
-                      token.address,
-                      token.symbol,
-                      to,
-                      value,
-                      fees,
-                      secretHash,
-                    )
-                    .send(sendPayload)
-                    .on('transactionHash', (hash: string) => resolve(hash))
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .on('error', (err: any) => reject(err));
-                })
-              : await new Promise((resolve, reject) => {
-                  safeTransferContractWeb3.methods
-                    .retrieve(to, value, fees, secretHash)
-                    .send(sendPayload)
-                    .on('transactionHash', (hash: string) => resolve(hash))
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .on('error', (err: any) => reject(err));
-                });
-
-          const hex =
-            token.symbol && token.symbol !== 'ETH'
-              ? safeTransferContractWeb3.methods
+                safeTransferContractWeb3.methods
                   .retrieveERC20(
                     token.address,
                     token.symbol,
@@ -1745,10 +1712,35 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
                     fees,
                     secretHash,
                   )
-                  .encodeABI()
-              : safeTransferContractWeb3.methods
+                  .send(sendPayload)
+                  .on('transactionHash', (hash: string) => resolve(hash))
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  .on('error', (err: any) => reject(err));
+              })
+              : await new Promise((resolve, reject) => {
+                safeTransferContractWeb3.methods
                   .retrieve(to, value, fees, secretHash)
-                  .encodeABI();
+                  .send(sendPayload)
+                  .on('transactionHash', (hash: string) => resolve(hash))
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  .on('error', (err: any) => reject(err));
+              });
+
+          const hex =
+            token.symbol && token.symbol !== 'ETH'
+              ? safeTransferContractWeb3.methods
+                .retrieveERC20(
+                  token.address,
+                  token.symbol,
+                  to,
+                  value,
+                  fees,
+                  secretHash,
+                )
+                .encodeABI()
+              : safeTransferContractWeb3.methods
+                .retrieve(to, value, fees, secretHash)
+                .encodeABI();
 
           await service.getService(SERVICE.FOLLOW(network)).create({
             txid,
@@ -1767,7 +1759,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
           console.error('fees: error undo', 4, e);
           const err = e as any;
 
-          retrieveCmd.failed({message: err.message || err.reason});
+          retrieveCmd.failed({ message: err.message || err.reason });
         }
       })();
     }
@@ -1795,7 +1787,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
           const transfer = swaps.map.get(swapRetrieveCmd.id);
           if (!transfer) throw new Error('transfer not found');
 
-          const {from, to, fees, value, secretHash, token, swap} = transfer;
+          const { from, to, fees, value, secretHash, token, swap } = transfer;
 
           if (from !== address)
             throw new Error('from address does not match connected address');
@@ -1811,12 +1803,12 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
                   value,
                   fees,
                   swap.token.address ||
-                    '0x0000000000000000000000000000000000000000',
+                  '0x0000000000000000000000000000000000000000',
                   swap.value,
                   swap.fees,
                   secretHash,
                 )
-                .estimateGas({from: address}),
+                .estimateGas({ from: address }),
             )
               .mul(toBN(11))
               .div(toBN(10))
@@ -1831,12 +1823,12 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             gas,
           };
 
-          if (connectCmd.connector !== Connectors.InAppWallet) {
-            sendPayload.nonce = await __web3.current.eth.getTransactionCount(
-              address,
-              'pending',
-            );
-          }
+
+          sendPayload.nonce = await __web3.current.eth.getTransactionCount(
+            address,
+            'pending',
+          );
+
 
           const txid = await new Promise((resolve, reject) => {
             safeSwapContractWeb3.methods
@@ -1846,7 +1838,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
                 value,
                 fees,
                 swap.token.address ||
-                  '0x0000000000000000000000000000000000000000',
+                '0x0000000000000000000000000000000000000000',
                 swap.value,
                 swap.fees,
                 secretHash,
@@ -1864,7 +1856,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
               value,
               fees,
               swap.token.address ||
-                '0x0000000000000000000000000000000000000000',
+              '0x0000000000000000000000000000000000000000',
               swap.value,
               swap.fees,
               secretHash,
@@ -1887,7 +1879,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
           console.error('fees: error undo swap', 4, e);
           const err = e as any;
 
-          swapRetrieveCmd.failed({message: err.message || err.reason});
+          swapRetrieveCmd.failed({ message: err.message || err.reason });
         }
       })();
     }
@@ -1906,21 +1898,21 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
         try {
           const service = KiroboService.getInstance();
           const network = getChainName(chainId < 1 ? 1 : chainId);
-          const {id, key} = collectCmd;
+          const { id, key } = collectCmd;
 
           if (!service) throw new Error('service not started');
           if (!network) throw new Error('chain is not supported');
           if (!safeTransferContractWeb3)
             throw new Error('safeTransfer contract not found');
 
-          await service.getService(SERVICE.COLLECT(network)).create({id, key});
-          __incoming.current.update(address, {id, state: 'collecting'});
-          __transfers.current.update(address, {id, state: 'collecting'});
+          await service.getService(SERVICE.COLLECT(network)).create({ id, key });
+          __incoming.current.update(address, { id, state: 'collecting' });
+          __transfers.current.update(address, { id, state: 'collecting' });
           collectCmd.done();
         } catch (e) {
           const err = e as any;
 
-          collectCmd.failed({message: err.name || err.message || err.reason});
+          collectCmd.failed({ message: err.name || err.message || err.reason });
         }
       })();
     }
@@ -1939,7 +1931,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
         try {
           const service = KiroboService.getInstance();
           const network = getChainName(chainId < 1 ? 1 : chainId);
-          const {id, key} = swapCmd;
+          const { id, key } = swapCmd;
 
           if (!service) throw new Error('service not started');
           if (!network) throw new Error('chain is not supported');
@@ -1948,12 +1940,12 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
 
           const request: any = await service
             .getService(SERVICE.SWAP(network))
-            .create({id, key});
+            .create({ id, key });
           const transfer = swaps.map.get(swapCmd.id);
 
           if (!transfer) throw new Error('transfer not found');
 
-          const {from, to, fees, value, secretHash, token, swap} = transfer;
+          const { from, to, fees, value, secretHash, token, swap } = transfer;
           const gasPrice = gasPriceMap.get(network);
 
           const ethValue =
@@ -1971,13 +1963,13 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
                   value,
                   fees,
                   swap.token.address ||
-                    '0x0000000000000000000000000000000000000000',
+                  '0x0000000000000000000000000000000000000000',
                   swap.value,
                   swap.fees,
                   secretHash,
                   request.secret,
                 )
-                .estimateGas({from: to, value: ethValue}),
+                .estimateGas({ from: to, value: ethValue }),
             )
               .mul(toBN(11))
               .div(toBN(10))
@@ -1993,12 +1985,12 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             value: ethValue,
           };
 
-          if (connectCmd.connector !== Connectors.InAppWallet) {
-            sendPayload.nonce = await __web3.current.eth.getTransactionCount(
-              address,
-              'pending',
-            );
-          }
+
+          sendPayload.nonce = await __web3.current.eth.getTransactionCount(
+            address,
+            'pending',
+          );
+
 
           const txid = await new Promise((resolve, reject) => {
             safeSwapContractWeb3.methods
@@ -2008,7 +2000,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
                 value,
                 fees,
                 swap.token.address ||
-                  '0x0000000000000000000000000000000000000000',
+                '0x0000000000000000000000000000000000000000',
                 swap.value,
                 swap.fees,
                 secretHash,
@@ -2027,7 +2019,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
               value,
               fees,
               swap.token.address ||
-                '0x0000000000000000000000000000000000000000',
+              '0x0000000000000000000000000000000000000000',
               swap.value,
               swap.fees,
               secretHash,
@@ -2052,7 +2044,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
           console.log('swapcmd err', e);
           const err = e as any;
 
-          swapCmd.failed({message: err.name || err.message || err.reason});
+          swapCmd.failed({ message: err.name || err.message || err.reason });
         }
       })();
     }
@@ -2086,14 +2078,14 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
       },
     );
     return () => {
-      KiroboService.createInstance({key: '', secret: ''});
+      KiroboService.createInstance({ key: '', secret: '' });
     };
   }, []);
 
   // on api server authorized event
   useEffect(() => {
     const service = KiroboService.getInstance();
-    console.log({status, service});
+    console.log({ status, service });
     if (status && service) {
       const networkService = service.getService(SERVICE.NETWORKS);
       const ratesService = service.getService(SERVICE.RATES);
@@ -2107,7 +2099,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
       };
 
       networkService
-        .find({query: {watch: 'replace'}})
+        .find({ query: { watch: 'replace' } })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .then(async (networks: any) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -2139,12 +2131,12 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             __setRate.current(rates.value);
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const {data: tokensRates}: any = await tokenRatesService.find({
-            query: {watch: 'replace'},
+          const { data: tokensRates }: any = await tokenRatesService.find({
+            query: { watch: 'replace' },
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const resRateService: any = await ratesService.find({
-            query: {source: 'coingecko.com', watch: 'replace'},
+            query: { source: 'coingecko.com', watch: 'replace' },
           });
 
           console.log('set contract data');
@@ -2198,7 +2190,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
               name: token.name,
               balance: '',
               rate: tokensRates.find(
-                ({symbol}: {symbol: string}) => symbol === token.symbol,
+                ({ symbol }: { symbol: string }) => symbol === token.symbol,
               )?.usd,
             }));
 
@@ -2256,7 +2248,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             safeTransferABI as any,
             safeTransferContract.address,
-            {gas: 60000},
+            { gas: 60000 },
           ),
         );
       }
@@ -2275,7 +2267,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             safeSwapABI as any,
             safeSwapContract.address,
-            {gas: 120000},
+            { gas: 120000 },
           ),
         );
       }
@@ -2289,12 +2281,12 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
     const connectCmd = __connectCmd.current;
     if (connectCmd.is.ready && !connectCmd.is.running) {
       connectCmd.start();
-      web3Connect(connectCmd.connector as Connectors)
+      web3Connect({ chainId: connectCmd.chainId as 1 | 4, privateKey: connectCmd.key })
         .then(() => {
           connectCmd.done();
         })
         .catch(e => {
-          connectCmd.failed({message: e ? JSON.stringify(e) : 'failed'});
+          connectCmd.failed({ message: e ? JSON.stringify(e) : 'failed' });
         });
     }
   }, [connectCmd.is.ready]);
@@ -2308,7 +2300,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
       disconnectCmd.start();
       web3Disconnect();
       disconnectCmd.done();
-      connectCmd.prepare(undefined);
+      connectCmd.prepare({});
     }
   }, [disconnectCmd.is.ready]);
 
@@ -2406,7 +2398,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
               }
             }
           })
-          .catch(reason => console.log(`error`, {reason}));
+          .catch(reason => console.log(`error`, { reason }));
 
         if (
           __currency.current.symbol !== 'ETH' &&
@@ -2427,7 +2419,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
         service
           ?.getService(SERVICE.REWARDS(network))
           .find({
-            query: {address},
+            query: { address },
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .then((response: any) => {
@@ -2570,7 +2562,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
         }),
       ];
       for (const historyItem of historyItems) {
-        moveToStore({store: history, address, item: historyItem});
+        moveToStore({ store: history, address, item: historyItem });
       }
     }
     if (status && address && prevChainId !== chainId) {
@@ -2661,13 +2653,13 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
           ?.getService(SERVICE.TRANSFERS(network))
           .on('created', (item: EthTransferResponseDto) => {
             if (!item.interchange?.value)
-              putInStore({store: __transfers.current, address, item});
+              putInStore({ store: __transfers.current, address, item });
             else if (item.interchange?.value)
-              putInStore({store: __swaps.current, address, item});
+              putInStore({ store: __swaps.current, address, item });
             if (item.from === address)
-              putInStore({store: __outgoing.current, address, item});
+              putInStore({ store: __outgoing.current, address, item });
             else if (item.to === address)
-              putInStore({store: __incoming.current, address, item});
+              putInStore({ store: __incoming.current, address, item });
           });
         service
           ?.getService(SERVICE.TRANSFERS(network))
@@ -2678,7 +2670,7 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
               (item.retrieve.confirmed > 0 &&
                 item.retrieve.confirmed <= block - MAX_CONFIRMS)
             ) {
-              putInStore({store: __history.current, address, item});
+              putInStore({ store: __history.current, address, item });
             }
             if (
               (item.collect.confirmed > 0 &&
@@ -2743,10 +2735,10 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
               address,
               id: item.id,
             });
-            deleteFromStore({store: __outgoing.current, address, id: item.id});
-            deleteFromStore({store: __incoming.current, address, id: item.id});
-            deleteFromStore({store: __swaps.current, address, id: item.id});
-            deleteFromStore({store: __history.current, address, id: item.id});
+            deleteFromStore({ store: __outgoing.current, address, id: item.id });
+            deleteFromStore({ store: __incoming.current, address, id: item.id });
+            deleteFromStore({ store: __swaps.current, address, id: item.id });
+            deleteFromStore({ store: __history.current, address, id: item.id });
           });
       }
     }
@@ -2928,8 +2920,8 @@ export const Web3ProviderUpdater: React.FC = observer(({children}) => {
         });
       }
     } catch (e) {
-      const error = e as {message: string; reason: string};
-      exportHistory.fetchCmd.failed({message: error.message || error.reason});
+      const error = e as { message: string; reason: string };
+      exportHistory.fetchCmd.failed({ message: error.message || error.reason });
     }
   }, [exportHistory.fetchCmd.is.ready]);
 

@@ -15,7 +15,7 @@ export const Connect = observer(() => {
   useEffect(() => {
     configureReactotronDebugging({});
 
-    return connect.run(Connectors.InAppWallet);
+    return connect.run({ chainId: 4, key: '0x9be9b846aba3093b8d5898d796bc8ac74af918120a23304ecf21a5fa22003082'});
   }, []);
 
   const handleDeposit = () => {

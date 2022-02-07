@@ -1,7 +1,7 @@
 import Web3 from 'web3';
-import {utils} from 'ethers';
-import {AbstractConnector} from '@web3-react/abstract-connector';
-import {Connectors} from '../hooks/useWeb3';
+import { utils } from 'ethers';
+import { AbstractConnector } from '@web3-react/abstract-connector';
+import { Connectors } from '../hooks/useWeb3';
 import SecureLS from 'secure-ls';
 
 export interface NetworkConnectorArguments {
@@ -14,7 +14,7 @@ export interface NetworkConnectorArguments {
 export interface IInAppWalletConnector {
   name: string;
   web3: Web3;
-  activate(): Promise<{provider: string; chainId: number; account: string}>;
+  activate(): Promise<{ provider: string; chainId: number; account: string }>;
   getProvider(): Promise<string>;
   getChainId(): Promise<number>;
   getAccount(): Promise<string | null>;
@@ -24,8 +24,7 @@ export interface IInAppWalletConnector {
 
 export class InAppWalletConnector
   extends AbstractConnector
-  implements IInAppWalletConnector
-{
+  implements IInAppWalletConnector {
   private secureStorage = new SecureLS();
   public static DEFAULT_PATH = "m/44'/60'/0'/0/0";
 
@@ -39,7 +38,7 @@ export class InAppWalletConnector
     }
   };
 
-  public paths: {[key: string]: {[key: number]: string}} = this.getPaths();
+  public paths: { [key: string]: { [key: number]: string } } = this.getPaths();
 
   public static setActiveAccount = (account: string | undefined): void => {
     InAppWalletConnector.activeAccount = account;
@@ -49,7 +48,7 @@ export class InAppWalletConnector
   public name = Connectors.InAppWallet;
   public web3: Web3;
 
-  private readonly providers: {[chainId: number]: string};
+  private readonly providers: { [chainId: number]: string };
   private currentChainId: number;
   private static mnemonic: string | undefined =
     'front assume robust donkey senior economy maple enhance click bright game alcohol';
@@ -75,7 +74,7 @@ export class InAppWalletConnector
         ),
       );
     } else {
-      this.paths[walletFirst.address] = {0: walletFirst.address};
+      this.paths[walletFirst.address] = { 0: walletFirst.address };
       privateKeys.push(walletFirst.privateKey);
     }
 
@@ -86,16 +85,8 @@ export class InAppWalletConnector
   constructor({
     urls,
     defaultChainId,
-  }: NetworkConnectorArguments & {path?: string}) {
-    console.log(
-      'constructor InAppWalletConnector.mnemonic start',
-      InAppWalletConnector.mnemonic,
-      urls,
-      defaultChainId,
-    );
+  }: NetworkConnectorArguments & { path?: string }) {
     super();
-
-    console.log('constructor success start');
     if (!InAppWalletConnector.mnemonic) throw new Error('mnemonic not found');
 
     this.hdNode = utils.HDNode.fromMnemonic(InAppWalletConnector.mnemonic);
@@ -124,19 +115,11 @@ export class InAppWalletConnector
   }
 
   public static getWeb3({
-    urls,
-    defaultChainId,
+    url,
     privateKey,
-  }: NetworkConnectorArguments & {privateKey: string}) {
-    
-
-    // const hdNode = utils.HDNode.fromMnemonic(InAppWalletConnector.mnemonic);
-    // const currentChainId = defaultChainId || Number(Object.keys(urls)[0]);
-
-    // const privateKey = hdNode.derivePath(`m/44'/60'/0'/0/0`).privateKey
-
+  }: { url: string, privateKey: string }) {
     const web3 = new Web3(
-      new Web3.providers.HttpProvider(urls[defaultChainId || 4]),
+      new Web3.providers.HttpProvider(url),
     );
 
     const addresses = new Set<string>();
@@ -151,12 +134,12 @@ export class InAppWalletConnector
     InAppWalletConnector.activeAccount =
       InAppWalletConnector.activeAccount || Array.from(addresses)[0];
 
-    return {web3, addresses};
+    return { web3, addresses };
   }
 
   public handleAccountChanged(account: string): void {
     InAppWalletConnector.setActiveAccount(account);
-    this.emitUpdate({account});
+    this.emitUpdate({ account });
   }
 
   public addWalletAddress = (): void => {
@@ -165,7 +148,7 @@ export class InAppWalletConnector
     ).address;
 
     const setNewAddress = (privateKey: string) => {
-      const {address} = this.web3.eth.accounts.privateKeyToAccount(privateKey);
+      const { address } = this.web3.eth.accounts.privateKeyToAccount(privateKey);
       this.web3.eth.accounts.wallet.add({
         privateKey,
         address,
@@ -252,6 +235,6 @@ export class InAppWalletConnector
 
   public changeChainId(chainId: number): void {
     this.currentChainId = chainId;
-    this.emitUpdate({provider: this.providers[this.currentChainId], chainId});
+    this.emitUpdate({ provider: this.providers[this.currentChainId], chainId });
   }
 }

@@ -1,33 +1,10 @@
-import {useWeb3React} from '@web3-react/core';
-import {AbstractConnector} from '@web3-react/abstract-connector';
-import {InjectedConnector} from '@web3-react/injected-connector';
-// import { NetworkConnector } from '@web3-react/network-connector'
-import {WalletConnectConnector} from '@web3-react/walletconnect-connector';
-import {WalletLinkConnector} from '@web3-react/walletlink-connector';
-// import { LedgerConnector } from '@web3-react/ledger-connector'
-// import { TrezorConnector } from '@web3-react/trezor-connector'
-// import { LatticeConnector } from '@web3-react/lattice-connector'
-import {FrameConnector} from '@web3-react/frame-connector';
-// import { AuthereumConnector } from '@web3-react/authereum-connector'
-// import { FortmaticConnector } from '@web3-react/fortmatic-connector'
-// import { MagicConnector } from '@web3-react/magic-connector'
-// import { PortisConnector } from '@web3-react/portis-connector'
-// import { TorusConnector } from '@web3-react/torus-connector'
-import {MewConnectConnector} from '@myetherwallet/mewconnect-connector';
-import {InAppWalletConnector} from '../customConnectors/InAppWalletConnector';
-import {Web3ReactContextInterface} from '@web3-react/core/dist/types';
+import { InAppWalletConnector } from '../customConnectors/InAppWalletConnector';
+import { Web3ReactContextInterface } from '@web3-react/core/dist/types';
 import Web3 from 'web3';
-import {useState} from 'react';
-
-const POLLING_INTERVAL = 12000;
+import { useState } from 'react';
 
 export enum Connectors {
   InAppWallet = 'InAppWallet',
-  Injected = 'Injected',
-  WalletConnect = 'WalletConnect',
-  WalletLink = 'WalletLink',
-  MyEtherWallet = 'MyEtherWallet',
-  Frame = 'Frame',
 }
 
 export interface IConnectParams {
@@ -41,10 +18,10 @@ type ConnectorType = Required<Web3ReactContextInterface>['connector'] & {
 };
 
 export interface IWeb3ReactContext {
-  connect: (
-    connectorName: Connectors,
-    params?: IConnectParams,
-  ) => Promise<void>;
+  connect: (p: {
+    chainId: 1 | 4,
+    privateKey: string,
+  }) => Promise<void>;
   disconnect: () => void;
   library: Web3;
   chainId?: number;
@@ -53,81 +30,15 @@ export interface IWeb3ReactContext {
 }
 
 export const useWeb3 = (): IWeb3ReactContext => {
-  // const {
-  //   connector,
-  //   library,
-  //   chainId,
-  //   account,
-  //   activate,
-  //   deactivate,
-  //   active,
-  //   error,
-  // } = useWeb3React();
-
   const [account, setAccount] = useState<string | undefined>();
   const [active, setActive] = useState<boolean>(false);
   const [chainId, setChainId] = useState<number>(-1);
   const [library, setLibrary] = useState<Web3>(new Web3());
-  const RPC_URLS: {[chainId: number]: string} = {
+
+  const RPC_URLS: { [chainId: number]: string } = {
     1: `https://mainnet.infura.io/v3/14c73ecdbcaa464585aa7c438fdf6a77`,
     4: `https://rinkeby.infura.io/v3/14c73ecdbcaa464585aa7c438fdf6a77`,
   };
-
-  // const inAppWalletConnect = () => {
-  //   console.log('set new wallet');
-  //   return new InAppWalletConnector({
-  //     urls: {4: RPC_URLS[4]},
-  //     defaultChainId: 4,
-  //   });
-  // };
-
-  // const injected = (params: IConnectParams) =>
-  //   new InjectedConnector({...params}); // supportedChainIds: [1, 4] })
-
-  // const walletConnect = (params: IConnectParams) =>
-  //   new WalletConnectConnector({
-  //     rpc: {4: RPC_URLS[4], 1: RPC_URLS[1]},
-  //     bridge: 'https://bridge.walletconnect.org',
-  //     qrcode: true,
-  //     pollingInterval: POLLING_INTERVAL,
-  //     ...params,
-  //   });
-
-  // const walletLink = (params: IConnectParams) =>
-  //   new WalletLinkConnector({
-  //     url: RPC_URLS[1],
-  //     appName: 'dapp.kirobo.me',
-  //     ...params,
-  //   });
-
-  // const myEtherWallet = (params: IConnectParams) =>
-  //   new MewConnectConnector({
-  //     url: RPC_URLS[1],
-  //     ...params,
-  //   });
-
-  // const frame = (params: IConnectParams) =>
-  //   new FrameConnector({
-  //     supportedChainIds: [4],
-  //     ...params,
-  //   });
-
-  // type IConnectors =
-  //   | typeof inAppWalletConnect
-  //   | typeof injected
-  //   | typeof walletConnect
-  //   | typeof walletLink
-  //   | typeof myEtherWallet
-  //   | typeof frame;
-
-  // const connectorByName: {[connectorName in Connectors]: IConnectors} = {
-  //   [Connectors.InAppWallet]: inAppWalletConnect,
-  //   [Connectors.Injected]: injected,
-  //   [Connectors.WalletConnect]: walletConnect,
-  //   [Connectors.WalletLink]: walletLink,
-  //   [Connectors.MyEtherWallet]: myEtherWallet,
-  //   [Connectors.Frame]: frame,
-  // };
 
   interface ConnectorNode {
     connector: ConnectorType;
@@ -135,19 +46,17 @@ export const useWeb3 = (): IWeb3ReactContext => {
 
   const connectors: ConnectorNode[] = [];
 
-  const connect = async (
-    connectorName: Connectors,
-    params: IConnectParams = {},
-  ) => {
-    const {web3, addresses} = InAppWalletConnector.getWeb3({
-      urls: {4: RPC_URLS[4]},
-      defaultChainId: 4,
-      privateKey: '0x9be9b846aba3093b8d5898d796bc8ac74af918120a23304ecf21a5fa22003082',
+  const connect = async ({ chainId, privateKey }: {
+    chainId: 1 | 4,
+    privateKey: string,
+  }) => {
+    const { web3, addresses } = InAppWalletConnector.getWeb3({
+      url: RPC_URLS[chainId],
+      privateKey,
     });
 
-    console.log('connect wallet');
     const address = Array.from(addresses)[0];
-    setChainId(4);
+    setChainId(chainId);
     setAccount(address);
     setLibrary(web3);
     if (address) {
@@ -169,5 +78,3 @@ export const useWeb3 = (): IWeb3ReactContext => {
   };
 };
 
-// export interface IUseWeb3State extends ReturnType<typeof useWeb3> {}
-// export type UseWeb3Hook = () => IUseWeb3State
