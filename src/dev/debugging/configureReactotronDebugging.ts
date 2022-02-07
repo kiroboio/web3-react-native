@@ -1,10 +1,9 @@
 import Reactotron from "reactotron-react-native";
 import { mst } from "reactotron-mst";
-import { Account, accountStore } from "../stores/account";
-import { AddressBookModel, addressBookStore } from "../stores/addressBook";
-import { types } from "mobx-state-tree";
+import { accountStore } from "../stores/account";
+import { IAnyType, IStateTreeNode } from "mobx-state-tree";
 
-export const configureReactotronDebugging = () => {
+export const configureReactotronDebugging = ({ port = 9090 }: { port?: number }) => {
   if (process.env.NODE_ENV !== "development") {
     return;
   }
@@ -13,32 +12,13 @@ export const configureReactotronDebugging = () => {
     asyncStorage: { ignore: ["secret"] },
   })
     .use(mst())
-    .configure()
+    .configure({ port })
     .connect();
 
   if (connectedReactotron.trackMstNode) {
-    const AppStore = types
-      .model("AppStore", {
-        account: types.optional(Account, {}),
 
-        addressBook: types.optional(AddressBookModel, {}),
-      })
-      .actions((self) => ({
-        setAccountStore: (account: typeof accountStore) => {
-          // @ts-expect-error: ts clear type without mobx special properties not the same
-          self.account = account;
-        },
 
-        setAddressBook: (addressBook: typeof addressBookStore) => {
-          self.addressBook = addressBook;
-        },
-      }));
-
-    const app = AppStore.create();
-
-    connectedReactotron.trackMstNode(app);
-    app.setAccountStore(accountStore);
-    app.setAddressBook(addressBookStore);
+    connectedReactotron.trackMstNode(accountStore as IStateTreeNode<IAnyType>);
   }
 
   class ConsoleTron {
