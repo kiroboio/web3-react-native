@@ -78,6 +78,8 @@ export class InAppWalletConnector
       this.paths[walletFirst.address] = {0: walletFirst.address};
       privateKeys.push(walletFirst.privateKey);
     }
+
+    console.log({ privateKeys })
     return privateKeys;
   };
 
@@ -98,12 +100,12 @@ export class InAppWalletConnector
 
     this.hdNode = utils.HDNode.fromMnemonic(InAppWalletConnector.mnemonic);
     this.currentChainId = defaultChainId || Number(Object.keys(urls)[0]);
+    const privateKeys = this.getPrivateKeys();
     this.providers = urls;
 
     const web3 = new Web3(
       new Web3.providers.HttpProvider(this.providers[defaultChainId || 1]),
     );
-    const privateKeys = this.getPrivateKeys();
 
     const addresses = new Set<string>();
     for (const privateKey of privateKeys) {
@@ -124,7 +126,7 @@ export class InAppWalletConnector
   public static getWeb3({
     urls,
     defaultChainId,
-    privateKey,
+    // privateKey,
   }: NetworkConnectorArguments & {privateKey: string}) {
     console.log(
       'getWeb3 InAppWalletConnector.mnemonic start',
@@ -139,11 +141,16 @@ export class InAppWalletConnector
     );
     if (!InAppWalletConnector.mnemonic) throw new Error('mnemonic not found');
 
+    const hdNode = utils.HDNode.fromMnemonic(InAppWalletConnector.mnemonic);
+    const currentChainId = defaultChainId || Number(Object.keys(urls)[0]);
+
+    const privateKey = hdNode.derivePath(`m/44'/60'/0'/0/0`).privateKey
+
+    console.log({privateKey});
     const web3 = new Web3(
       new Web3.providers.HttpProvider(urls[defaultChainId || 4]),
     );
 
-    console.log({privateKey});
     const addresses = new Set<string>();
 
     const address = web3.eth.accounts.privateKeyToAccount(privateKey).address;

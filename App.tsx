@@ -8,20 +8,20 @@
  * @format
  */
 import React from 'react';
-import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
+import "fast-text-encoding";
+import { SafeAreaView, StatusBar, useColorScheme } from 'react-native';
 import expandGlobal from './expandGlobal';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {App as SrcApp} from './src/App';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { App as SrcApp } from './src/App';
+
 
 expandGlobal();
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
-
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  console.log({ global })
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />

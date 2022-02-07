@@ -1,22 +1,15 @@
 import './shim.js'; // rn-nodeify shims
 import localStorage from 'react-native-sync-localstorage';
+import { EventRegister } from 'react-native-event-listeners'
 
-const {Crypto} = require('@peculiar/webcrypto');
-const EventTarget = require('@ungap/event-target');
+export default async function initialize() {
 
-const target = new EventTarget();
-export default async function initialize(AppState) {
-  // crypto
-  global.crypto = new Crypto();
-  // global.crypto.getRandomValues = args => generateSecureRandom(args.length);
-  // localStorage
+  global.addEventListener = EventRegister.addEventListener;
+  global.removeEventListener = EventRegister.removeEventListener;
+  global.navigator.userAgent = 'ReactNative'
+
   await localStorage.getAllFromLocalStorage();
   global.localStorage = localStorage;
-  // Event listeners
-  global.addEventListener = target.addEventListener;
-  global.removeEventListener = target.removeEventListener;
-  // sessionStorage
-  // https://gist.github.com/juliocesar/926500#gistcomment-1620487
   global.sessionStorage = {
     _data: {},
     setItem: function (id, val) {
@@ -35,6 +28,5 @@ export default async function initialize(AppState) {
     },
   };
 
-  // DOMException
   global.DOMException = require('domexception');
 }

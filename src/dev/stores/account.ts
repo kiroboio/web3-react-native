@@ -14,6 +14,7 @@ import Web3 from 'web3';
 import {Connectors} from '../hooks/useWeb3';
 import {currencyValueToWei} from '../utils';
 import {isMobile} from '../utils/isMobile';
+import crypto from 'crypto'
 
 type MobxClearInstance<T> = Omit<Instance<T>, symbol>;
 
@@ -1268,12 +1269,8 @@ export interface ICommand
   extends MobxClearInstance<ReturnType<typeof createCommand>> {}
 
 const createSecretHash = (passcode: string) => {
-  const _publicSalt = new Uint16Array(10);
-  const _privateSalt = new Uint16Array(10);
-  window.crypto.getRandomValues(_publicSalt);
-  window.crypto.getRandomValues(_privateSalt);
-  const publicSalt = _publicSalt.join('');
-  const privateSalt = _privateSalt.join('');
+  const publicSalt = crypto.randomBytes(10).toString();
+  const privateSalt = crypto.randomBytes(10).toString();
   const secretHash = sha3(
     sha3(privateSalt + sha3(publicSalt + passcode)) || '',
   );
