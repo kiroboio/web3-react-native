@@ -22,7 +22,6 @@ import {
   EthTransferResponseDto,
 } from '../dto/EthTransfersDto';
 import { EthErc20ResponseDto } from '../dto/EthErc20Dto';
-import { useWallet } from '../hooks/useWallet';
 import { useSwapRates } from '../hooks/useSwapRates';
 import { wait } from '../utils/wait';
 import { ProviderProps } from './KiroboProvider';
@@ -453,8 +452,6 @@ export const Web3ProviderUpdater = observer(({ children, apiKey, apiSecret, infu
     ERC20TokenList,
   } = useAccount();
 
-  const { setNewMnemonic, generateNewMnemonic, setActiveAccount } = useWallet();
-
   useSwapRates();
 
   const [status, setStatus] = useState<boolean>(false);
@@ -839,10 +836,7 @@ export const Web3ProviderUpdater = observer(({ children, apiKey, apiSecret, infu
   const __setAddress = useRef(setAddress);
   const __setCanGetRewards = useRef(setCanGetRewards);
   const __setChainId = useRef(setChainId);
-  const __setNewMnemonic = useRef(setNewMnemonic);
-  const __generateNewMnemonic = useRef(generateNewMnemonic);
   const __wallet = useRef(wallet);
-  const __setActiveAccount = useRef(setActiveAccount);
 
   const __currency = useRef(currency);
   const __desiredCurrency = useRef(desiredCurrency);
@@ -919,18 +913,9 @@ export const Web3ProviderUpdater = observer(({ children, apiKey, apiSecret, infu
     __setAddress.current = setAddress;
     __setCanGetRewards.current = setCanGetRewards;
     __setChainId.current = setChainId;
-    __setNewMnemonic.current = setNewMnemonic;
-    __generateNewMnemonic.current = generateNewMnemonic;
+
     __wallet.current = wallet;
-    __setActiveAccount.current = setActiveAccount;
   });
-
-  useEffect(() => {
-    const setNewMnemonic = __setNewMnemonic.current;
-
-    if (!wallet.mnemonic.data) return;
-    setNewMnemonic(wallet.mnemonic.data);
-  }, [wallet.mnemonic.data]);
 
 
   useEffect(() => {
@@ -948,31 +933,6 @@ export const Web3ProviderUpdater = observer(({ children, apiKey, apiSecret, infu
       wallet.removeAddressCmd.failed({ message: err.message || err.reason });
     }
   }, [wallet.removeAddressCmd.is.ready]);
-
-  useEffect(() => {
-    const setNewMnemonic = __setNewMnemonic.current;
-    const wallet = __wallet.current;
-    const mnemonic = __wallet.current.mnemonic.data;
-    if (
-      !wallet.mnemonic.restoreCmd.is.ready ||
-      wallet.mnemonic.restoreCmd.is.running
-    )
-      return;
-
-    try {
-      wallet.mnemonic.restoreCmd.start();
-
-      if (!mnemonic) {
-        throw new Error('no mnemonic');
-      }
-      setNewMnemonic(mnemonic);
-      wallet.mnemonic.restoreCmd.done();
-    } catch (e) {
-      const err = e as any;
-
-      wallet.mnemonic.restoreCmd.failed({ message: err.message || err.reason });
-    }
-  }, [wallet.mnemonic.restoreCmd.is.ready]);
 
 
   useEffect(() => {

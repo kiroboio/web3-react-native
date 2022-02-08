@@ -10678,7 +10678,7 @@ reactotron-mst@3.1.3:
 
 reactotron-react-native@^5.0.1:
   version "5.0.1"
-  resolved "https://registry.npmjs.org/reactotron-react-native/-/reactotron-react-native-5.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/reactotron-react-native/-/reactotron-react-native-5.0.1.tgz#a14bbc370020812274baf55f763dd8e78421e040"
   integrity sha512-xiwTjJuQga6mD+ynt7fj50scMbfiSFDe1AIsf7VVqcSDrYJNnzVqHZtlC+lqYlzDu7TucOUQVVxJALcASEWYrg==
   dependencies:
     mitt "1.1.3"
