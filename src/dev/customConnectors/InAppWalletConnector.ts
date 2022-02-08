@@ -109,11 +109,10 @@ export class InAppWalletConnector
     });
     addresses.add(address);
 
-    console.log({ addresses })
     InAppWalletConnector.activeAccount =
       InAppWalletConnector.activeAccount || Array.from(addresses)[0];
 
-    this.hdNode = utils.HDNode.fromSeed(privateKey);
+    this.hdNode = utils.HDNode.fromMnemonic(InAppWalletConnector.mnemonic || "");
 
     console.log({ hdnode: this.hdNode, addresses })
     this.providers = { [chainId]: url };
@@ -121,6 +120,7 @@ export class InAppWalletConnector
     this.web3 = web3;
     this.addresses = Array.from(addresses);
 
+    this.activate();
     this.getPrivateKeys();
   }
 
@@ -139,6 +139,7 @@ export class InAppWalletConnector
     const setNewAddress = (privateKey: string) => {
       const { address } = this.web3.eth.accounts.privateKeyToAccount(privateKey);
       console.log({ newAddress: address })
+      console.log({ privateKey })
       this.web3.eth.accounts.wallet.add({
         privateKey,
         address,
@@ -208,6 +209,7 @@ export class InAppWalletConnector
       chainId: this.currentChainId,
       account: InAppWalletConnector.activeAccount || this.addresses[0],
     };
+    
   }
 
   public async getProvider(): Promise<string> {

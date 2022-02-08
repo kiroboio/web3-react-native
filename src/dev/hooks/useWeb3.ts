@@ -1,5 +1,4 @@
 import { InAppWalletConnector } from '../customConnectors/InAppWalletConnector';
-import { Web3ReactContextInterface } from '@web3-react/core/dist/types';
 import Web3 from 'web3';
 import { useState } from 'react';
 
@@ -10,24 +9,19 @@ export enum Connectors {
 export interface IConnectParams {
   readonly supportedChainIds?: number[];
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ConnectorType = Required<Web3ReactContextInterface>['connector'] & {
-  addWalletAddress?: () => void;
-  removeWalletAddress?: (a: string) => void;
-  handleAccountChanged?: (a: string) => void;
-};
 
 export interface IWeb3ReactContext {
+  library: Web3;
   connect: (p: {
     chainId: 1 | 4,
     privateKey: string,
   }) => Promise<void>;
   disconnect: () => void;
-  library: Web3;
+  connector: InAppWalletConnector | undefined;
+  changeActiveAccount: (address: string) => void;
+  active: boolean;
   chainId?: number;
   address?: null | string;
-  active: boolean;
-  connector: InAppWalletConnector | undefined;
 }
 
 export const useWeb3 = (): IWeb3ReactContext => {
@@ -41,12 +35,6 @@ export const useWeb3 = (): IWeb3ReactContext => {
     1: `https://mainnet.infura.io/v3/14c73ecdbcaa464585aa7c438fdf6a77`,
     4: `https://rinkeby.infura.io/v3/14c73ecdbcaa464585aa7c438fdf6a77`,
   };
-
-  interface ConnectorNode {
-    connector: ConnectorType;
-  }
-
-  const connectors: ConnectorNode[] = [];
 
   const connect = async ({ chainId, privateKey }: {
     chainId: 1 | 4,
@@ -70,8 +58,18 @@ export const useWeb3 = (): IWeb3ReactContext => {
     }
   };
 
+  const changeActiveAccount = (address: string) => {
+    if(!connector?.addresses.includes(address)) return;
+    InAppWalletConnector.setActiveAccount(address);
+    setAccount(address);
+  }
+
   const disconnect = () => {
-    delete connectors[0];
+    setChainId(-1);
+    setAccount('');
+    setLibrary(new Web3());
+    setConnector(undefined);
+    setActive(false)
   };
 
   return {
@@ -81,7 +79,8 @@ export const useWeb3 = (): IWeb3ReactContext => {
     active,
     chainId,
     library,
-    connector
+    connector,
+    changeActiveAccount
   };
 };
 

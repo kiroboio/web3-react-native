@@ -1,19 +1,19 @@
-import {values} from 'mobx';
+import { values } from 'mobx';
 import {
   EthTransferResponseDto,
   EthTokenInfo,
   EthSwapInfo,
 } from '../dto/EthTransfersDto';
-import {generateMnemonic} from 'bip39';
+import { generateMnemonic } from 'bip39';
 
-import {castToSnapshot, getSnapshot, Instance, types} from 'mobx-state-tree';
+import { castToSnapshot, getSnapshot, Instance, types } from 'mobx-state-tree';
 
-import {sha3, toBN} from 'web3-utils';
+import { sha3, toBN } from 'web3-utils';
 
 import Web3 from 'web3';
-import {Connectors} from '../hooks/useWeb3';
-import {currencyValueToWei} from '../utils';
-import {isMobile} from '../utils/isMobile';
+import { Connectors } from '../hooks/useWeb3';
+import { currencyValueToWei } from '../utils';
+import { isMobile } from '../utils/isMobile';
 import crypto from 'crypto'
 
 type MobxClearInstance<T> = Omit<Instance<T>, symbol>;
@@ -180,7 +180,7 @@ export const Swap = types.model({
   fees: types.optional(types.string, ''),
 });
 
-export interface ITransferToken extends MobxClearInstance<typeof Token> {}
+export interface ITransferToken extends MobxClearInstance<typeof Token> { }
 
 export const Transfer = types
   .model({
@@ -207,7 +207,7 @@ export const Transfer = types
     },
   }));
 
-export interface ITransfer extends MobxClearInstance<typeof Transfer> {}
+export interface ITransfer extends MobxClearInstance<typeof Transfer> { }
 
 export const CmdStatus = types
   .model({
@@ -240,7 +240,7 @@ export const CmdStatus = types
       self.done = false;
       self.failed = false;
     },
-    finished(err?: {err: {message: string}}) {
+    finished(err?: { err: { message: string } }) {
       self.ready = false;
       self.running = false;
       if (err) {
@@ -254,7 +254,7 @@ export const CmdStatus = types
     },
   }));
 
-export interface ICmdStatus extends MobxClearInstance<typeof CmdStatus> {}
+export interface ICmdStatus extends MobxClearInstance<typeof CmdStatus> { }
 
 const CmdModel = {
   is: types.optional(CmdStatus, {}),
@@ -269,8 +269,8 @@ export const CmdActions = (self: {
   done() {
     self.is.finished();
   },
-  failed({message}: {message: string}) {
-    self.is.finished({err: {message}});
+  failed({ message }: { message: string }) {
+    self.is.finished({ err: { message } });
   },
   clearErrors() {
     self.is.failed = false;
@@ -281,7 +281,7 @@ export const CmdActions = (self: {
   },
 });
 
-export interface ICmdActions extends MobxClearInstance<typeof CmdActions> {}
+export interface ICmdActions extends MobxClearInstance<typeof CmdActions> { }
 
 export const CmdBase = types.model('CMDBase', CmdModel).actions(CmdActions);
 
@@ -289,7 +289,7 @@ export interface ICmdBase extends MobxClearInstance<typeof CmdBase> {
   is: ICmdStatus;
 }
 
-export type ConnectParams = { key?: string, chainId?: 1 | 4}
+export type ConnectParams = { key?: string, chainId?: 1 | 4 }
 export const ConnectCmd = CmdBase.named('ConnectCmd')
   .props({
     key: types.optional(types.string, ''),
@@ -297,7 +297,7 @@ export const ConnectCmd = CmdBase.named('ConnectCmd')
     isConnected: types.optional(types.boolean, false),
   })
   .actions(self => ({
-    prepare({key, chainId }: ConnectParams) {
+    prepare({ key, chainId }: ConnectParams) {
       if (!key) {
         self.isConnected = false;
         self.key = '';
@@ -385,7 +385,7 @@ export const SafeTransfer = types
     },
   }));
 
-export interface ISafeTransfer extends MobxClearInstance<typeof SafeTransfer> {}
+export interface ISafeTransfer extends MobxClearInstance<typeof SafeTransfer> { }
 export interface IStakingItem {
   address: string;
 }
@@ -396,12 +396,12 @@ export const Staking = types
     balance: types.optional(types.string, ''),
   })
   .actions(self => ({
-    setData({address}: IStakingItem) {
+    setData({ address }: IStakingItem) {
       self.address = address;
     },
   }));
 
-export interface IStaking extends MobxClearInstance<typeof Staking> {}
+export interface IStaking extends MobxClearInstance<typeof Staking> { }
 export interface IKiroTokenItem {
   address: string;
 }
@@ -411,12 +411,12 @@ export const KiroToken = types
     address: types.optional(types.string, ''),
   })
   .actions(self => ({
-    setData({address}: IKiroTokenItem) {
+    setData({ address }: IKiroTokenItem) {
       self.address = address;
     },
   }));
 
-export interface IKiroToken extends MobxClearInstance<typeof KiroToken> {}
+export interface IKiroToken extends MobxClearInstance<typeof KiroToken> { }
 
 export interface IERC20TokenItem {
   address: string;
@@ -442,7 +442,7 @@ export const ERC20Token = types
     },
   }))
   .actions(self => ({
-    setData({address, name, symbol, decimals, balance}: IERC20TokenItem) {
+    setData({ address, name, symbol, decimals, balance }: IERC20TokenItem) {
       self.address = address;
       self.name = name;
       self.symbol = symbol;
@@ -480,7 +480,7 @@ export const ERC20Tokens = types
     }: IERC20TokenItem) {
       self.map.set(
         address,
-        ERC20Token.create({address, name, symbol, decimals, balance, rate}),
+        ERC20Token.create({ address, name, symbol, decimals, balance, rate }),
       );
     },
     setBalance(address: string, balance: string) {
@@ -535,7 +535,7 @@ export const DeviceInfo = types
     },
   }));
 
-export interface IDeviceInfo extends MobxClearInstance<typeof DeviceInfo> {}
+export interface IDeviceInfo extends MobxClearInstance<typeof DeviceInfo> { }
 
 const EthAddressPrimitive = types.custom<string, string>({
   name: 'Eth Address',
@@ -557,7 +557,7 @@ const EthAddressPrimitive = types.custom<string, string>({
 });
 
 export interface IEthAddressPrimitive
-  extends MobxClearInstance<typeof EthAddressPrimitive> {}
+  extends MobxClearInstance<typeof EthAddressPrimitive> { }
 
 export const ApprovedCmd = CmdBase.named('ApprovedCmd')
   .props({
@@ -829,7 +829,7 @@ export const RateCmd = CmdBase.named('usdRateCmd')
         self.is.prepared();
       }
     },
-    setRate({rate, symbol}: {rate: string; symbol: string}) {
+    setRate({ rate, symbol }: { rate: string; symbol: string }) {
       self.rate = rate;
       self.symbol = symbol;
     },
@@ -854,7 +854,7 @@ export const SwapRates = types
           self.swapCompareCmd.prepare(params);
         },
         get data() {
-          const {inputAmount, outputTokenAddress, uniswapOutputAmount} =
+          const { inputAmount, outputTokenAddress, uniswapOutputAmount } =
             self.swapCompareCmd;
           const data = {
             inputAmount,
@@ -877,7 +877,7 @@ export const SwapRates = types
           });
         },
         get data() {
-          const {outputRate} = self.swapOutputRateCmd;
+          const { outputRate } = self.swapOutputRateCmd;
           const data = {
             outputRate,
           };
@@ -891,8 +891,8 @@ export const SwapRates = types
           return createCommand(self.currentCurrencyUsdRateCmd.is);
         },
         get data() {
-          const {rate, symbol} = self.currentCurrencyUsdRateCmd;
-          return {rate, symbol};
+          const { rate, symbol } = self.currentCurrencyUsdRateCmd;
+          return { rate, symbol };
         },
       };
     },
@@ -902,8 +902,8 @@ export const SwapRates = types
           return createCommand(self.desiredCurrencyUsdRateCmd.is);
         },
         get data() {
-          const {rate, symbol} = self.desiredCurrencyUsdRateCmd;
-          return {rate, symbol};
+          const { rate, symbol } = self.desiredCurrencyUsdRateCmd;
+          return { rate, symbol };
         },
       };
     },
@@ -915,11 +915,11 @@ export const SwapRates = types
     setOutputAmount(outputAmount: string) {
       self.swapCompareCmd.setOutputAmount(outputAmount);
     },
-    setCurrentCurrencyUsdRate({rate, symbol}: {rate: string; symbol: string}) {
-      self.currentCurrencyUsdRateCmd.setRate({rate, symbol});
+    setCurrentCurrencyUsdRate({ rate, symbol }: { rate: string; symbol: string }) {
+      self.currentCurrencyUsdRateCmd.setRate({ rate, symbol });
     },
-    setDesiredCurrencyUsdRate({rate, symbol}: {rate: string; symbol: string}) {
-      self.desiredCurrencyUsdRateCmd.setRate({rate, symbol});
+    setDesiredCurrencyUsdRate({ rate, symbol }: { rate: string; symbol: string }) {
+      self.desiredCurrencyUsdRateCmd.setRate({ rate, symbol });
     },
   }));
 
@@ -945,7 +945,7 @@ export const Transfers = types
           return createCommand(self.fetchCmd.is);
         },
         run(amount: number) {
-          self.fetchCmd.prepare({list: self.name, amount});
+          self.fetchCmd.prepare({ list: self.name, amount });
         },
       };
     },
@@ -955,7 +955,7 @@ export const Transfers = types
           return createCommand(self.exportCmd.is);
         },
         run() {
-          self.fetchCmd.prepare({list: self.name, amount: 40});
+          self.fetchCmd.prepare({ list: self.name, amount: 40 });
         },
         get progress() {
           return (self.fetched / self.count) * 100;
@@ -964,7 +964,7 @@ export const Transfers = types
     },
   }))
   .actions(self => ({
-    setName({name}: {name: string}) {
+    setName({ name }: { name: string }) {
       self.name = name;
     },
     setCount(count: number) {
@@ -1085,8 +1085,8 @@ export const Transfers = types
             return a.updatedAt.getTime() < b.updatedAt.getTime()
               ? 1
               : a.updatedAt.getTime() === b.updatedAt.getTime()
-              ? 0
-              : -1;
+                ? 0
+                : -1;
           })
       );
     },
@@ -1199,10 +1199,9 @@ const Wallet = types
     addWalletAddress() {
       self.addAddressCmd.prepare();
     },
-    setAccounts(accounts: string[]) {
-      accounts.forEach(account => {
-        self.accounts.push(account);
-      });
+    addAccount(newAccount: string) {
+      if (self.accounts.includes(newAccount)) return
+      self.accounts.push(newAccount);
     },
     setActiveAccount(activeAccount: string | undefined) {
       self.activeAccount = activeAccount || '';
@@ -1270,7 +1269,7 @@ export const createCommand = (is: Instance<typeof CmdStatus>) => ({
 });
 
 export interface ICommand
-  extends MobxClearInstance<ReturnType<typeof createCommand>> {}
+  extends MobxClearInstance<ReturnType<typeof createCommand>> { }
 
 const createSecretHash = (passcode: string) => {
   const publicSalt = crypto.randomBytes(10).toString();
@@ -1278,7 +1277,7 @@ const createSecretHash = (passcode: string) => {
   const secretHash = sha3(
     sha3(privateSalt + sha3(publicSalt + passcode)) || '',
   );
-  return {privateSalt, publicSalt, secretHash};
+  return { privateSalt, publicSalt, secretHash };
 };
 
 export interface IConnectData {
@@ -1304,18 +1303,18 @@ export const Account = types
     tokenBalance: types.optional(types.string, ''),
     stakingBalance: types.optional(types.string, ''),
     rate: types.optional(types.number, 0),
-    history: types.optional(Transfers, {name: 'history'}),
-    transfers: types.optional(Transfers, {name: 'transfers'}),
-    incoming: types.optional(Transfers, {name: 'incoming'}),
-    outgoing: types.optional(Transfers, {name: 'outgoing'}),
+    history: types.optional(Transfers, { name: 'history' }),
+    transfers: types.optional(Transfers, { name: 'transfers' }),
+    incoming: types.optional(Transfers, { name: 'incoming' }),
+    outgoing: types.optional(Transfers, { name: 'outgoing' }),
     approvedCmd: types.optional(ApprovedCmd, {}),
     depositCmd: types.optional(DepositCmd, {}),
     retrieveCmd: types.optional(RetrieveCmd, {}),
     collectCmd: types.optional(CollectCmd, {}),
     connectCmd: types.optional(ConnectCmd, {}),
     disconnectCmd: types.optional(DisconnectCmd, {}),
-    transactions: types.optional(Transfers, {name: 'transactions'}),
-    exportHistory: types.optional(Transfers, {name: 'history'}),
+    transactions: types.optional(Transfers, { name: 'transactions' }),
+    exportHistory: types.optional(Transfers, { name: 'history' }),
     sendCmd: types.optional(SendCmd, {}),
     safeTransferMap: types.map(SafeTransfer),
     stakingMap: types.map(Staking),
@@ -1345,7 +1344,7 @@ export const Account = types
     swapDepositCmd: types.optional(swapDepositCmd, {}),
     swapRetrieveCmd: types.optional(RetrieveCmd, {}),
     swapCmd: types.optional(CollectCmd, {}),
-    swaps: types.optional(Transfers, {name: 'swaps'}),
+    swaps: types.optional(Transfers, { name: 'swaps' }),
     swapperAddress: types.optional(EthAddressPrimitive, ''),
     swapperBalance: types.optional(types.string, ''),
     swapRates: types.optional(SwapRates, {}),
@@ -1360,8 +1359,8 @@ export const Account = types
         get is(): ICommand {
           return createCommand(self.retrieveCmd.is);
         },
-        run({id}: IRetrieveData) {
-          self.retrieveCmd.prepare({id: id});
+        run({ id }: IRetrieveData) {
+          self.retrieveCmd.prepare({ id: id });
         },
         get data(): IRetrieveData {
           return {
@@ -1377,8 +1376,8 @@ export const Account = types
         get is(): ICommand {
           return createCommand(self.swapRetrieveCmd.is);
         },
-        run({id}: IRetrieveData) {
-          self.swapRetrieveCmd.prepare({id: id});
+        run({ id }: IRetrieveData) {
+          self.swapRetrieveCmd.prepare({ id: id });
         },
         get data(): IRetrieveData {
           return {
@@ -1406,9 +1405,9 @@ export const Account = types
           message?: string;
         }) {
           console.log('run deposit');
-          const {secretHash, publicSalt, privateSalt} =
+          const { secretHash, publicSalt, privateSalt } =
             createSecretHash(passcode);
-          console.log({secretHash, publicSalt, privateSalt});
+          console.log({ secretHash, publicSalt, privateSalt });
           if (secretHash) {
             self.depositCmd.prepare({
               from: self.address,
@@ -1466,7 +1465,7 @@ export const Account = types
           passcode: string;
           message?: string;
         }) {
-          const {secretHash, publicSalt, privateSalt} =
+          const { secretHash, publicSalt, privateSalt } =
             createSecretHash(passcode);
           if (secretHash) {
             self.swapDepositCmd.prepare({
@@ -1481,7 +1480,7 @@ export const Account = types
             });
           }
         },
-        get data(): DepositCmdParams & {desiredValue: string} {
+        get data(): DepositCmdParams & { desiredValue: string } {
           return {
             get from() {
               return self.swapDepositCmd.from;
@@ -1516,11 +1515,11 @@ export const Account = types
         get is(): ICommand {
           return createCommand(self.collectCmd.is);
         },
-        run({id, passcode}: {id: string; passcode: string}) {
+        run({ id, passcode }: { id: string; passcode: string }) {
           const item = self.incoming.map.get(id);
           if (item && item.salt) {
             const key = sha3(item.salt + passcode) || '';
-            self.collectCmd.prepare({id, key});
+            self.collectCmd.prepare({ id, key });
           }
         },
         get data(): CollectCmdParams {
@@ -1540,11 +1539,11 @@ export const Account = types
         get is(): ICommand {
           return createCommand(self.swapCmd.is);
         },
-        run({id, passcode}: {id: string; passcode: string}) {
+        run({ id, passcode }: { id: string; passcode: string }) {
           const item = self.swaps.map.get(id);
           if (item && item.salt) {
             const key = sha3(item.salt + passcode) || '';
-            self.swapCmd.prepare({id, key});
+            self.swapCmd.prepare({ id, key });
           }
         },
         get data(): CollectCmdParams {
@@ -1636,7 +1635,7 @@ export const Account = types
       );
     },
     approvedToken(symbol: string, amount: string) {
-      const {toBN} = Web3.utils;
+      const { toBN } = Web3.utils;
       const isApproved = !(
         symbol !== 'ETH' && toBN(self.allowance).cmp(toBN(amount)) === -1
       );
@@ -1647,11 +1646,11 @@ export const Account = types
       const contract =
         self.formType !== 'swap'
           ? self.safeTransferMap.get(
-              getChainName(self.chainId > 0 ? self.chainId : 1),
-            )
+            getChainName(self.chainId > 0 ? self.chainId : 1),
+          )
           : self.safeSwapMap.get(
-              getChainName(self.chainId > 0 ? self.chainId : 1),
-            );
+            getChainName(self.chainId > 0 ? self.chainId : 1),
+          );
       if (contract) return contract.fees(parseFloat(amount) > 0 ? amount : '0');
       return '';
     },
@@ -1659,11 +1658,11 @@ export const Account = types
       const contract =
         self.formType !== 'swap'
           ? self.safeTransferMap.get(
-              getChainName(self.chainId > 0 ? self.chainId : 1),
-            )
+            getChainName(self.chainId > 0 ? self.chainId : 1),
+          )
           : self.safeSwapMap.get(
-              getChainName(self.chainId > 0 ? self.chainId : 1),
-            );
+            getChainName(self.chainId > 0 ? self.chainId : 1),
+          );
       if (contract) {
         if (self.left <= 0) return 0;
         return (
@@ -1778,7 +1777,7 @@ export const Account = types
       } = data;
       self.safeTransferMap
         .get(chainName)
-        ?.setData({address, feesFormula, rewardFormula, synced});
+        ?.setData({ address, feesFormula, rewardFormula, synced });
     },
     setSafeSwapContract(chainName: string, data: ISafeTransferItem) {
       if (!chainName || !data) return;
@@ -1793,28 +1792,28 @@ export const Account = types
       } = data;
       self.safeSwapMap
         .get(chainName)
-        ?.setData({address, feesFormula, rewardFormula, synced});
+        ?.setData({ address, feesFormula, rewardFormula, synced });
     },
     setStakingContract(chainName: string, data: IStakingItem) {
       if (!chainName || !data) return;
       if (!self.stakingMap.has(chainName)) {
         self.stakingMap.set(chainName, Staking.create());
       }
-      const {address = ''} = data;
-      self.stakingMap.get(chainName)?.setData({address});
+      const { address = '' } = data;
+      self.stakingMap.get(chainName)?.setData({ address });
     },
     setKiroTokenContract(chainName: string, data: IKiroTokenItem) {
       if (!chainName || !data) return;
       if (!self.kiroTokenMap.has(chainName)) {
         self.kiroTokenMap.set(chainName, KiroToken.create());
       }
-      const {address = ''} = data;
-      self.kiroTokenMap.get(chainName)?.setData({address});
+      const { address = '' } = data;
+      self.kiroTokenMap.get(chainName)?.setData({ address });
     },
     setERC20TokenContract(chainName: string, data: Array<ERC20TokenItem>) {
       if (!chainName || !data) return;
       self.ERC20TokensMap.set(chainName, {});
-      for (const {address, name, symbol, decimals, balance, rate} of data) {
+      for (const { address, name, symbol, decimals, balance, rate } of data) {
         self.ERC20TokensMap.get(chainName)?.addToken({
           address,
           name,

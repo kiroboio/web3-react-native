@@ -393,6 +393,7 @@ export const Web3ProviderUpdater: React.FC = observer(({ children }) => {
     active: web3Active,
     chainId: web3ChainId,
     address: web3Address,
+    changeActiveAccount,
   } = useWeb3();
 
   const {
@@ -939,19 +940,30 @@ export const Web3ProviderUpdater: React.FC = observer(({ children }) => {
     if (!wallet.addAddressCmd.is.ready || wallet.addAddressCmd.is.running)
       return;
 
-    try {
-      wallet.addAddressCmd.start();
-      // if (!wallet.mnemonic.data) throw new Error('no mnemonic');
-      if (!web3Connector) throw new Error('connector not found');
+    const addAccountAsync = async () => {
+      try {
+        wallet.addAddressCmd.start();
+        // if (!wallet.mnemonic.data) throw new Error('no mnemonic');
+        if (!web3Connector) throw new Error('connector not found');
 
-      if (!web3Connector?.addWalletAddress) throw new Error('wrong connector');
-      web3Connector?.addWalletAddress();
+        if (!web3Connector?.addWalletAddress) throw new Error('wrong connector');
+        await web3Connector?.addWalletAddress();
 
-      wallet.addAddressCmd.done();
-    } catch (e) {
-      const err = e as any;
-      wallet.addAddressCmd.failed({ message: err.message || err.reason });
+        const accounts = new Set();
+        Object.keys(web3.eth.accounts.wallet).forEach(key => {
+          if (!web3.eth.accounts.wallet[parseInt(key)]?.address) return;
+          accounts.add(web3.eth.accounts.wallet[parseInt(key)].address);
+        });
+        const uniqueAccountsArray = Array.from(accounts) as string[];
+        uniqueAccountsArray.forEach(wallet.addAccount)
+        wallet.addAddressCmd.done();
+      } catch (e) {
+        const err = e as any;
+        wallet.addAddressCmd.failed({ message: err.message || err.reason });
+      }
     }
+
+    addAccountAsync();
   }, [wallet.addAddressCmd.is.ready]);
 
   useEffect(() => {
@@ -999,29 +1011,29 @@ export const Web3ProviderUpdater: React.FC = observer(({ children }) => {
     ? Object.keys(__web3.current.eth.accounts.wallet)
     : null;
 
-  const prevMnemonic = usePrevious(wallet.mnemonic.data);
-  useEffect(() => {
-    const wallet = __wallet.current;
-    const connectCmd = __connectCmd.current;
-    const web3 = __web3.current;
+  // const prevWeb3Address = usePrevious(web3Address);
+  // useEffect(() => {
+  //   const wallet = __wallet.current;
+  //   const web3 = __web3.current;
 
-    if (prevMnemonic && prevMnemonic === wallet.mnemonic.data) return;
-    const accounts = new Set();
-    Object.keys(web3.eth.accounts.wallet).forEach(key => {
-      if (!web3.eth.accounts.wallet[parseInt(key)]?.address) return;
-      accounts.add(web3.eth.accounts.wallet[parseInt(key)].address);
-    });
-    const uniqueAccountsArray = Array.from(accounts) as string[];
+  //   if(prevAddress && prevAddress === web3Address) return;
+  //   const accounts = new Set();
+  //   console.log(web3.eth.accounts.wallet, "web3.eth.accounts.wallet")
+  //   Object.keys(web3.eth.accounts.wallet).forEach(key => {
+  //     if (!web3.eth.accounts.wallet[parseInt(key)]?.address) return;
+  //     accounts.add(web3.eth.accounts.wallet[parseInt(key)].address);
+  //   });
+  //   const uniqueAccountsArray = Array.from(accounts) as string[];
 
-    if (!uniqueAccountsArray.includes(wallet.activeAccount)) {
-      wallet.setActiveAccount(uniqueAccountsArray[0]);
-      InAppWalletConnector.setActiveAccount(uniqueAccountsArray[0]);
-    } else {
-      wallet.setActiveAccount(wallet.activeAccount);
-      InAppWalletConnector.setActiveAccount(wallet.activeAccount);
-    }
-    wallet.setAccounts(uniqueAccountsArray);
-  }, [wallet.mnemonic.data, web3WalletAddressesAmount]);
+  //   // if (!uniqueAccountsArray.includes(wallet.activeAccount)) {
+  //   //   wallet.setActiveAccount(uniqueAccountsArray[0]);
+  //   //   InAppWalletConnector.setActiveAccount(uniqueAccountsArray[0]);
+  //   // } else {
+  //   //   wallet.setActiveAccount(wallet.activeAccount);
+  //   //   InAppWalletConnector.setActiveAccount(wallet.activeAccount);
+  //   // }
+  //   uniqueAccountsArray.forEach(wallet.addAccount)
+  // }, [web3Address]);
 
   useEffect(() => {
     const wallet = __wallet.current;
@@ -1034,11 +1046,9 @@ export const Web3ProviderUpdater: React.FC = observer(({ children }) => {
 
   useEffect(() => {
     const wallet = __wallet.current;
-    const setActiveAccount = __setActiveAccount.current;
 
-    if (!web3Connector?.handleAccountChanged) return;
-    web3Connector.handleAccountChanged(wallet.activeAccount);
-    setActiveAccount(wallet.activeAccount);
+    if (!wallet.activeAccount) return;
+    changeActiveAccount(wallet.activeAccount)
   }, [wallet.activeAccount]);
 
   useEffect(() => {
