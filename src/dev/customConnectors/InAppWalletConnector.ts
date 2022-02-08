@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import { utils } from 'ethers';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { Connectors } from '../hooks/useWeb3';
-import SecureLS from 'secure-ls';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 export interface NetworkConnectorArguments {
   urls: {
@@ -25,20 +25,22 @@ export interface IInAppWalletConnector {
 export class InAppWalletConnector
   extends AbstractConnector
   implements IInAppWalletConnector {
-  private secureStorage = new SecureLS();
+  private secureStorage = EncryptedStorage;
+
   public static DEFAULT_PATH = "m/44'/60'/0'/0/0";
 
   public static activeAccount: string | undefined;
 
-  private getPaths = () => {
+  private getPaths = async () => {
     try {
-      return this.secureStorage.get('paths') || {};
+      const paths = await this.secureStorage.getItem('paths') || '{}';
+      return JSON.parse(paths);
     } catch (e) {
       return {};
     }
   };
 
-  public paths: { [key: string]: { [key: number]: string } } = this.getPaths();
+  public paths: Promise<{ [key: string]: { [key: number]: string } }> = this.getPaths();
 
   public static setActiveAccount = (account: string | undefined): void => {
     InAppWalletConnector.activeAccount = account;
@@ -61,20 +63,22 @@ export class InAppWalletConnector
   }
   private hdNode: utils.HDNode;
 
-  public getPrivateKeys = (): string[] => {
+  public getPrivateKeys = async (): Promise<string[]> => {
     if (!InAppWalletConnector.mnemonic) throw new Error('mnemonic not found');
     const privateKeys: string[] = [];
     const walletFirst = this.hdNode.derivePath(
       InAppWalletConnector.DEFAULT_PATH,
     );
-    if (this.paths[walletFirst.address]) {
-      Object.keys(this.paths[walletFirst.address]).map((key: string) =>
+
+    const paths = await this.paths;
+    if (paths[walletFirst.address]) {
+      Object.keys(paths[walletFirst.address]).map((key: string) =>
         privateKeys.push(
           this.hdNode.derivePath(`m/44'/60'/0'/0/${key}`).privateKey,
         ),
       );
     } else {
-      this.paths[walletFirst.address] = { 0: walletFirst.address };
+      paths[walletFirst.address] = { 0: walletFirst.address };
       privateKeys.push(walletFirst.privateKey);
     }
 
@@ -82,42 +86,16 @@ export class InAppWalletConnector
     return privateKeys;
   };
 
+
+
   constructor({
-    urls,
-    defaultChainId,
-  }: NetworkConnectorArguments & { path?: string }) {
-    super();
-    if (!InAppWalletConnector.mnemonic) throw new Error('mnemonic not found');
-
-    this.hdNode = utils.HDNode.fromMnemonic(InAppWalletConnector.mnemonic);
-    this.currentChainId = defaultChainId || Number(Object.keys(urls)[0]);
-    const privateKeys = this.getPrivateKeys();
-    this.providers = urls;
-
-    const web3 = new Web3(
-      new Web3.providers.HttpProvider(this.providers[defaultChainId || 1]),
-    );
-
-    const addresses = new Set<string>();
-    for (const privateKey of privateKeys) {
-      const address = web3.eth.accounts.privateKeyToAccount(privateKey).address;
-      web3.eth.accounts.wallet.add({
-        privateKey: privateKey,
-        address,
-      });
-      addresses.add(address);
-    }
-
-    this.addresses = Array.from(addresses);
-    InAppWalletConnector.activeAccount =
-      InAppWalletConnector.activeAccount || this.addresses[0];
-    this.web3 = web3;
-  }
-
-  public static getWeb3({
     url,
     privateKey,
-  }: { url: string, privateKey: string }) {
+    chainId,
+  }: { url: string, privateKey: string, chainId: 1 | 4 }) {
+    super()
+
+    console.log("create wallet")
     const web3 = new Web3(
       new Web3.providers.HttpProvider(url),
     );
@@ -131,10 +109,19 @@ export class InAppWalletConnector
     });
     addresses.add(address);
 
+    console.log({ addresses })
     InAppWalletConnector.activeAccount =
       InAppWalletConnector.activeAccount || Array.from(addresses)[0];
 
-    return { web3, addresses };
+    this.hdNode = utils.HDNode.fromSeed(privateKey);
+
+    console.log({ hdnode: this.hdNode, addresses })
+    this.providers = { [chainId]: url };
+    this.currentChainId = chainId;
+    this.web3 = web3;
+    this.addresses = Array.from(addresses);
+
+    this.getPrivateKeys();
   }
 
   public handleAccountChanged(account: string): void {
@@ -142,46 +129,50 @@ export class InAppWalletConnector
     this.emitUpdate({ account });
   }
 
-  public addWalletAddress = (): void => {
+  public addWalletAddress = async (): Promise<void> => {
+    console.log("addWalletAddress")
     const walletFirstAddress = this.hdNode.derivePath(
       InAppWalletConnector.DEFAULT_PATH,
     ).address;
 
+    console.log({ walletFirstAddress })
     const setNewAddress = (privateKey: string) => {
       const { address } = this.web3.eth.accounts.privateKeyToAccount(privateKey);
+      console.log({ newAddress: address })
       this.web3.eth.accounts.wallet.add({
         privateKey,
         address,
       });
       this.addresses.push(address);
-      this.secureStorage.set('paths', this.paths);
+      this.secureStorage.setItem('paths', JSON.stringify(this.paths));
     };
 
+    const paths = await this.paths;
     const onEmptyKeyNotFounded = () => {
       const keysAmount: number = Object.keys(
-        this.paths[walletFirstAddress],
+        paths[walletFirstAddress],
       ).length;
       const walletAccount = this.hdNode.derivePath(
         `m/44'/60'/0'/0/${keysAmount}`,
       );
-      this.paths[walletFirstAddress][keysAmount] = walletAccount.address;
+      paths[walletFirstAddress][keysAmount] = walletAccount.address;
       const privateKey = walletAccount.privateKey;
 
       setNewAddress(privateKey);
     };
 
     let index = 0;
-    for (const key of Object.keys(this.paths[walletFirstAddress])) {
+    for (const key of Object.keys(paths[walletFirstAddress])) {
       if (Number(key) !== index) {
         const walletAccount = this.hdNode.derivePath(`m/44'/60'/0'/0/${index}`);
-        this.paths[walletFirstAddress][index] = walletAccount.address;
+        paths[walletFirstAddress][index] = walletAccount.address;
         const privateKey = walletAccount.privateKey;
 
         setNewAddress(privateKey);
         break;
       } else if (
         index ===
-        Object.keys(this.paths[walletFirstAddress]).length - 1
+        Object.keys(paths[walletFirstAddress]).length - 1
       ) {
         onEmptyKeyNotFounded();
       }
@@ -189,16 +180,18 @@ export class InAppWalletConnector
     }
   };
 
-  public removeWalletAddress = (address: string): void => {
+  public removeWalletAddress = async (address: string): Promise<void> => {
     this.web3.eth.accounts.wallet.remove(address);
     this.addresses = this.addresses.filter(a => a !== address);
     const walletFirstAddress = this.hdNode.derivePath(
       InAppWalletConnector.DEFAULT_PATH,
     ).address;
-    Object.keys(this.paths[walletFirstAddress]).forEach((key: string) => {
-      if (this.paths[walletFirstAddress][Number(key)] === address) {
-        delete this.paths[walletFirstAddress][Number(key)];
-        this.secureStorage.set('paths', this.paths);
+
+    const paths = await this.paths;
+    Object.keys(paths[walletFirstAddress]).forEach((key: string) => {
+      if (paths[walletFirstAddress][Number(key)] === address) {
+        delete paths[walletFirstAddress][Number(key)];
+        this.secureStorage.setItem('paths', JSON.stringify(paths));
       }
     });
   };

@@ -61,6 +61,7 @@
     "react-native": "0.66.4",
     "react-native-crypto": "^2.2.0",
     "react-native-dns-lookup": "^1.0.3",
+    "react-native-encrypted-storage": "^4.0.2",
     "react-native-event-listeners": "^1.0.7",
     "react-native-level-fs": "^3.0.1",
     "react-native-os": "^1.2.6",

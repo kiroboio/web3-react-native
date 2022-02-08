@@ -10515,6 +10515,11 @@ react-native-dns-lookup@^1.0.3:
   resolved "https://registry.yarnpkg.com/react-native-dns-lookup/-/react-native-dns-lookup-1.0.3.tgz#db7c40edcb810e249753c45bd85b1924a1d337a0"
   integrity sha512-hl3Ine+PpfmsjYPM+vwrMGu0J1oSLFB4KXLhEz0Ujd3f0+v1US7okFHZSIIkE5PWtELrF2vp0ZehcepV2ZSBIQ==
 
+react-native-encrypted-storage@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-encrypted-storage/-/react-native-encrypted-storage-4.0.2.tgz#c7d59b1d3ff2f80d572be3e85aaab3fdee16744a"
+  integrity sha512-vneDkHGDuTvLQjUBztqb2YI8QoH1zxdJonPGTS+g57lfJZff9fAjoLSSb6NgMBebpXFcK3I3sEresGyL+3AArw==
+
 react-native-event-listeners@^1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/react-native-event-listeners/-/react-native-event-listeners-1.0.7.tgz#486d856dfebf295a7aeda97bc36d1cf81cee0623"

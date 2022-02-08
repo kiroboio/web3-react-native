@@ -9,7 +9,7 @@ import React, { useEffect } from 'react';
 import { View, Text, Button, FlatList, ListViewBase } from 'react-native';
 
 export const Connect = observer(() => {
-  const { address, active, connect, balance, block, deposit, retrieve, collect, outgoing, incoming } = useAccount();
+  const { address, active, connect, balance, block, deposit, retrieve, collect, outgoing, incoming, wallet } = useAccount();
   console.log({ address, active, balance, block });
   useEffect(() => {
     configureReactotronDebugging({});
@@ -47,12 +47,13 @@ export const Connect = observer(() => {
       <Text>test</Text>
       <Button title="deposit" onPress={handleDeposit} />
 
-      {incoming.list.map((trx) => {
+      <Button title='add address' onPress={() => wallet.addAddressCmd.prepare()}/>
+      {/* {incoming.list.map((trx) => {
         return <Button title="collect" key={trx.id} onPress={() => handleCollect(trx.id)} />
       })}
       {outgoing.list.map((trx) => {
         return <Button title="retrieve" key={trx.id} onPress={() => handleRetrieve(trx.id)} />
-      })}
+      })} */}
 
     </View>
   );

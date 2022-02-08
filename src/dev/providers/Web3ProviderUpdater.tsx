@@ -387,6 +387,7 @@ const AMOUNT_OF_TRANSACTIONS_UPPER_THRESHOLD = 99999999;
 export const Web3ProviderUpdater: React.FC = observer(({ children }) => {
   const {
     connect: web3Connect,
+    connector: web3Connector,
     disconnect: web3Disconnect,
     library: web3,
     active: web3Active,
@@ -940,11 +941,11 @@ export const Web3ProviderUpdater: React.FC = observer(({ children }) => {
 
     try {
       wallet.addAddressCmd.start();
-      if (!wallet.mnemonic.data) throw new Error('no mnemonic');
-      // if (!web3Connector) throw new Error('connector not started');
+      // if (!wallet.mnemonic.data) throw new Error('no mnemonic');
+      if (!web3Connector) throw new Error('connector not found');
 
-      // if (!web3Connector?.addWalletAddress) throw new Error('wrong connector');
-      // web3Connector?.addWalletAddress();
+      if (!web3Connector?.addWalletAddress) throw new Error('wrong connector');
+      web3Connector?.addWalletAddress();
 
       wallet.addAddressCmd.done();
     } catch (e) {
@@ -1035,8 +1036,8 @@ export const Web3ProviderUpdater: React.FC = observer(({ children }) => {
     const wallet = __wallet.current;
     const setActiveAccount = __setActiveAccount.current;
 
-    // if (!web3Connector?.handleAccountChanged) return;
-    // web3Connector.handleAccountChanged(wallet.activeAccount);
+    if (!web3Connector?.handleAccountChanged) return;
+    web3Connector.handleAccountChanged(wallet.activeAccount);
     setActiveAccount(wallet.activeAccount);
   }, [wallet.activeAccount]);
 

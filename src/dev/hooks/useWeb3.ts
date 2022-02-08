@@ -27,6 +27,7 @@ export interface IWeb3ReactContext {
   chainId?: number;
   address?: null | string;
   active: boolean;
+  connector: InAppWalletConnector | undefined;
 }
 
 export const useWeb3 = (): IWeb3ReactContext => {
@@ -34,6 +35,7 @@ export const useWeb3 = (): IWeb3ReactContext => {
   const [active, setActive] = useState<boolean>(false);
   const [chainId, setChainId] = useState<number>(-1);
   const [library, setLibrary] = useState<Web3>(new Web3());
+  const [connector, setConnector] = useState<InAppWalletConnector>();
 
   const RPC_URLS: { [chainId: number]: string } = {
     1: `https://mainnet.infura.io/v3/14c73ecdbcaa464585aa7c438fdf6a77`,
@@ -50,15 +52,19 @@ export const useWeb3 = (): IWeb3ReactContext => {
     chainId: 1 | 4,
     privateKey: string,
   }) => {
-    const { web3, addresses } = InAppWalletConnector.getWeb3({
+    console.log("connect in app")
+    const connector = new InAppWalletConnector({
       url: RPC_URLS[chainId],
       privateKey,
+      chainId
     });
 
+    const { web3, addresses } = connector;
     const address = Array.from(addresses)[0];
     setChainId(chainId);
     setAccount(address);
     setLibrary(web3);
+    setConnector(connector);
     if (address) {
       setActive(true);
     }
@@ -75,6 +81,7 @@ export const useWeb3 = (): IWeb3ReactContext => {
     active,
     chainId,
     library,
+    connector
   };
 };
 
