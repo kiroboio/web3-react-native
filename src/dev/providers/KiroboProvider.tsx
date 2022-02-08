@@ -4,9 +4,10 @@ import { Web3Provider } from './Web3Provider';
 
 const { accountStore, addressBookStore } = appStore;
 
-export const KiroboProvider = ({ apiKey, children }: { apiKey: string, children: JSX.Element | JSX.Element[] | null }) => (
+export type ProviderProps = { infuraKey: string, apiKey: string, apiSecret: string }
+export const KiroboProvider = ({ apiKey, apiSecret, infuraKey, children }:  ProviderProps & { children: JSX.Element | JSX.Element[] | null }) => (
   <AppContext.Provider value={{ accountStore, addressBookStore }}>
-    <Web3Provider apiKey={apiKey} />
+    <Web3Provider apiKey={apiKey} apiSecret={apiSecret} infuraKey={infuraKey} />
     {children}
   </AppContext.Provider>
 );

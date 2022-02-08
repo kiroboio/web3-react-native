@@ -23,15 +23,15 @@ export interface IWeb3ReactContext {
   address?: null | string;
 }
 
-export const useWeb3 = ({ apiKey }: { apiKey: string }): IWeb3ReactContext => {
+export const useWeb3 = ({ infuraKey }: { infuraKey: string }): IWeb3ReactContext => {
   const [address, setAddress] = useState<string | undefined>();
   const [active, setActive] = useState<boolean>(false);
   const [chainId, setChainId] = useState<number>(-1);
   const [library, setLibrary] = useState<Web3>(new Web3());
 
   const RPC_URLS: { [chainId: number]: string } = {
-    1: `https://mainnet.infura.io/v3/${apiKey}`,
-    4: `https://rinkeby.infura.io/v3/${apiKey}`,
+    1: `https://mainnet.infura.io/v3/${infuraKey}`,
+    4: `https://rinkeby.infura.io/v3/${infuraKey}`,
   };
 
   const connect = async ({ chainId, privateKey }: {

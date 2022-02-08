@@ -25,6 +25,7 @@ import { EthErc20ResponseDto } from '../dto/EthErc20Dto';
 import { useWallet } from '../hooks/useWallet';
 import { useSwapRates } from '../hooks/useSwapRates';
 import { wait } from '../utils/wait';
+import { ProviderProps } from './KiroboProvider';
 import axios, { AxiosResponse } from 'axios';
 
 const MAX_CONFIRMS = 30;
@@ -382,7 +383,7 @@ const removeFromStore = ({ store, address, filter }: RemoveFromStoreParams) => {
 };
 
 const AMOUNT_OF_TRANSACTIONS_UPPER_THRESHOLD = 99999999;
-export const Web3ProviderUpdater = observer(({ children, apiKey }: { children?: JSX.Element | JSX.Element[] | null, apiKey: string }) => {
+export const Web3ProviderUpdater = observer(({ children, apiKey, apiSecret, infuraKey }: ProviderProps & { children?: JSX.Element | JSX.Element[] | null }) => {
   const {
     connect: web3Connect,
     disconnect: web3Disconnect,
@@ -390,7 +391,7 @@ export const Web3ProviderUpdater = observer(({ children, apiKey }: { children?: 
     active: web3Active,
     chainId: web3ChainId,
     address: web3Address,
-  } = useWeb3({ apiKey });
+  } = useWeb3({ infuraKey });
 
   const {
     active,
@@ -1987,11 +1988,10 @@ export const Web3ProviderUpdater = observer(({ children, apiKey }: { children?: 
   // init
   useEffect(() => {
     const authDetails = {
-      key: 'YXVkIjoiaHR0cHM6Ly9hcGkua2lyb2JvLm1' ?? '',
-      secret: 'Ijoia2lyb2JvIiwic3ViIjoiNWU2MTNiNmVlYzgzMWQx' ?? '',
+      key: apiKey,
+      secret: apiSecret,
     };
 
-    console.log('createInstance');
     KiroboService.createInstance(
       {
         key: authDetails.key,
@@ -1999,9 +1999,7 @@ export const Web3ProviderUpdater = observer(({ children, apiKey }: { children?: 
       },
       (message: string, payload: any) => {
         const setCanGetRewards = __setCanGetRewards.current;
-        console.log('createInstance callback');
         if (message === 'authorized') {
-          console.log('createInstance authorized');
           setCanGetRewards(!!payload?.rewards);
           setStatus(true);
         }
