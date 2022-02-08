@@ -6,7 +6,7 @@ import {
 } from './dev';
 import React, { useEffect } from 'react';
 
-import { View, Text, Button, FlatList, ListViewBase } from 'react-native';
+import { View, Text, Button } from 'react-native';
 
 const privateKeys = ['0x9be9b846aba3093b8d5898d796bc8ac74af918120a23304ecf21a5fa22003082', '0x4f9d6e232c6dfe4eb194116287470a1244f37ecaf4f4a9223a88601d96e5df10', '0x9acb11e79277fa90555715d6e3e7e29c6d1e03a1c57757646afd33c51d3872e1', '0xb45c7305553a1e6e797850d772394ba11ffa38f2efd08d3e2349dee28463aef1']
 export const Connect = observer(() => {
@@ -51,7 +51,8 @@ export const Connect = observer(() => {
   console.log({ accounts: wallet.accounts })
   return (
     <View>
-      <Text>test</Text>
+      <Text>address: {address}</Text>
+      <Text>balance: {balance}</Text>
       <Button title="deposit" onPress={handleDeposit} />
 
       <Button title='add address' onPress={() => wallet.addAddressCmd.prepare()} />
