@@ -2739,37 +2739,7 @@ export const Web3ProviderUpdater = observer(({ children, apiKey, apiSecret, infu
     const query = `startblock=${startblock}&endblock=${endblock}&page=${page}&offset=${limit}&sort=desc`;
     return query;
   };
-  
-  // // on transactions.fetch command
-  // useEffect(() => {
-  //   const fetchNextTransactions = __fetchNextTransactions.current;
-  //   const transactions = __transactions.current;
-  //   //if (block < 1) return
 
-  //   fetchNextTransactions({
-  //     store: transactions,
-  //     queryBuilder: getTransactionsQuery,
-  //     endBlockTo: transactions.firstFetchedBlockNumber
-  //       ? transactions.firstFetchedBlockNumber - 1
-  //       : AMOUNT_OF_TRANSACTIONS_UPPER_THRESHOLD,
-  //   });
-  // }, [transactions.fetchCmd.is.ready]);
-
-  // useEffect(() => {
-  //   const prevBlock = __prevBlock.current;
-  //   if (block < 1 || !prevBlock || prevBlock < 1) return;
-  //   if (transactions.fetchCmd.is.running) return;
-
-  //   transactions.fetch.run(100);
-  //   fetchNextTransactions({
-  //     store: transactions,
-  //     queryBuilder: getTransactionsQuery,
-  //     startBlockFrom: transactions.lastFetchedBlockNumber + 1,
-  //   });
-  //   transactions.setLastFetchedBlockNumber(
-  //     transactions.lastFetchedBlockNumber + 1,
-  //   );
-  // }, [block]);
 
   // on swaps.fetch command
   useEffect(() => {
