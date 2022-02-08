@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import { toChecksumAddress } from 'web3-utils';
 import { toBN } from 'web3-utils';
 import { useAccount } from '../context/account';
-import { useWeb3, Connectors } from '../hooks/useWeb3';
+import { useWeb3 } from '../hooks/useWeb3';
 import KiroboService from '@kiroboio/safe-transfer-lib';
 import { observer } from 'mobx-react-lite';
 import {
@@ -23,8 +23,6 @@ import {
 } from '../dto/EthTransfersDto';
 import { EthErc20ResponseDto } from '../dto/EthErc20Dto';
 import { useWallet } from '../hooks/useWallet';
-import '@metamask/detect-provider';
-import { InAppWalletConnector } from '../customConnectors/InAppWalletConnector';
 import { useSwapRates } from '../hooks/useSwapRates';
 import { wait } from '../utils/wait';
 import axios, { AxiosResponse } from 'axios';
@@ -384,7 +382,7 @@ const removeFromStore = ({ store, address, filter }: RemoveFromStoreParams) => {
 };
 
 const AMOUNT_OF_TRANSACTIONS_UPPER_THRESHOLD = 99999999;
-export const Web3ProviderUpdater: React.FC = observer(({ children }) => {
+export const Web3ProviderUpdater = observer(({ children, apiKey }: { children?: JSX.Element | JSX.Element[] | null, apiKey: string }) => {
   const {
     connect: web3Connect,
     disconnect: web3Disconnect,
@@ -392,7 +390,7 @@ export const Web3ProviderUpdater: React.FC = observer(({ children }) => {
     active: web3Active,
     chainId: web3ChainId,
     address: web3Address,
-  } = useWeb3();
+  } = useWeb3({ apiKey });
 
   const {
     active,

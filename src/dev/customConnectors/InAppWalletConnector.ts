@@ -1,6 +1,5 @@
 import Web3 from 'web3';
 
-
 export class InAppWalletConnector  {
   public static activeAccount: string | undefined;
   public static address: string;
