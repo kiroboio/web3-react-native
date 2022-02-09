@@ -1404,10 +1404,8 @@ export const Account = types
           passcode: string;
           message?: string;
         }) {
-          console.log('run deposit');
           const { secretHash, publicSalt, privateSalt } =
             createSecretHash(passcode);
-          console.log({ secretHash, publicSalt, privateSalt });
           if (secretHash) {
             self.depositCmd.prepare({
               from: self.address,

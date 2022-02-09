@@ -35,7 +35,6 @@ class ServiceStore {
     secret: string;
     callback?: (message: string, payload: unknown) => void;
   }) => {
-    console.log('createInstance service', {key, secret});
     this.instance = KiroboService.createInstance({key, secret}, callback);
   };
 

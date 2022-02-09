@@ -1977,7 +1977,6 @@ export const Web3ProviderUpdater = observer(({ children, apiKey, apiSecret, infu
   // on api server authorized event
   useEffect(() => {
     const service = KiroboService.getInstance();
-    console.log({ status, service });
     if (status && service) {
       const networkService = service.getService(SERVICE.NETWORKS);
       const ratesService = service.getService(SERVICE.RATES);
@@ -2031,12 +2030,7 @@ export const Web3ProviderUpdater = observer(({ children, apiKey, apiSecret, infu
             query: { source: 'coingecko.com', watch: 'replace' },
           });
 
-          console.log('set contract data');
           for (const network of networks.data) {
-            console.log(
-              network.contracts.safeTransfer,
-              'network.contracts.safeTransfer',
-            );
             setNetworkDetails(network);
             if (network?.contracts?.safeTransfer) {
               __setSafeTransferContract.current(
@@ -2132,7 +2126,6 @@ export const Web3ProviderUpdater = observer(({ children, apiKey, apiSecret, infu
     const web3 = __web3.current;
     const chainId = __chainId.current;
     if (!web3) return;
-    console.log('setSafeTransferContractWeb3', safeTransferContract?.address);
     const setSafeTransferAsync = async () => {
       if (web3 && chainId && safeTransferContract) {
         setSafeTransferContractWeb3(
