@@ -1,5 +1,5 @@
 import React from 'react';
-import { KiroboProvider } from './dev/providers/KiroboProvider';
+import { KiroboProvider } from '@kiroboio/web3-react-native-safe-transfer';
 import { Connect } from './Connect';
 import { INFURA_KEY, API_KEY, API_SECRET } from "react-native-dotenv"
 

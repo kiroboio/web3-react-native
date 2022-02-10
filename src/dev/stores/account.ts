@@ -1272,8 +1272,8 @@ export interface ICommand
   extends MobxClearInstance<ReturnType<typeof createCommand>> { }
 
 const createSecretHash = (passcode: string) => {
-  const publicSalt = crypto.randomBytes(10).toString();
-  const privateSalt = crypto.randomBytes(10).toString();
+  const publicSalt = crypto.randomBytes(10).toString('hex');
+  const privateSalt = crypto.randomBytes(10).toString('hex');
   const secretHash = sha3(
     sha3(privateSalt + sha3(publicSalt + passcode)) || '',
   );
