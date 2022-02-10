@@ -8,7 +8,7 @@
  * @format
  */
 import React from 'react';
-import "fast-text-encoding";
+//import "fast-text-encoding";
 import { SafeAreaView, StatusBar, useColorScheme } from 'react-native';
 import './shim';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
