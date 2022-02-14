@@ -12,7 +12,7 @@
     "postinstall": "npx rn-nodeify --install fs,dns,dgram,process,path,console --hack"
   },
   "dependencies": {
-    "@kiroboio/web3-react-native-safe-transfer": "file:../web3-lib/web3-rn-lib.tgz",
+    "@kiroboio/web3-react-native-safe-transfer": "file:../kiroboio-web3-react-native-safe-transfer-1.0.0.tgz",
     "@types/react-native-dotenv": "^0.2.0",
     "base-64": "^1.0.0",
     "console-browserify": "^1.1.0",

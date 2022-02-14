@@ -1,12 +1,11 @@
-import { decode, encode } from 'base-64';
+import {decode, encode} from 'base-64';
 import localStorage from 'react-native-sync-localstorage';
-import { EventRegister } from 'react-native-event-listeners'
+import {EventRegister} from 'react-native-event-listeners';
 
 const initialize = async () => {
-
   global.addEventListener = EventRegister.addEventListener;
   global.removeEventListener = EventRegister.removeEventListener;
-  global.navigator.userAgent = 'ReactNative'
+  global.navigator.userAgent = 'ReactNative';
 
   await localStorage.getAllFromLocalStorage();
   global.localStorage = localStorage;
@@ -29,8 +28,7 @@ const initialize = async () => {
   };
 
   global.DOMException = require('domexception');
-}
-
+};
 
 if (!global.btoa) global.btoa = encode;
 if (!global.atob) global.atob = decode;
@@ -49,9 +47,9 @@ if (typeof process === 'undefined') {
 process.browser = false;
 if (typeof Buffer === 'undefined') global.Buffer = require('buffer').Buffer;
 if (typeof location === 'undefined')
-  global.location = { port: 80, protocol: 'https:' };
+  global.location = {port: 80, protocol: 'https:'};
 const isDev = typeof __DEV__ === 'boolean' && __DEV__;
-process.env['NODE_ENV'] = isDev ? 'development' : 'production';
+// process.env['NODE_ENV'] = isDev ? 'development' : 'production';
 if (typeof localStorage !== 'undefined') {
   localStorage.debug = isDev ? '*' : '';
 }

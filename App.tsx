@@ -9,11 +9,10 @@
  */
 import React from 'react';
 //import "fast-text-encoding";
-import { SafeAreaView, StatusBar, useColorScheme } from 'react-native';
+import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
 import './shim';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { App as SrcApp } from './src/App';
-
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {App as SrcApp} from './src/App';
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
