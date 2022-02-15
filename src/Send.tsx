@@ -14,12 +14,20 @@ import {View, Text, Button, TextInput, ScrollView} from 'react-native';
 // ];
 // const sendTo = ["0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc"]
 export const Send = observer(() => {
-  const {deposit, currency, setCurrency, ERC20TokenList} = useAccount();
+  const {
+    deposit,
+    currency,
+    setCurrency,
+    ERC20TokenList,
+    approvedToken,
+    approve,
+    safeTransferContract,
+  } = useAccount();
 
   const [sendToAddress, setSendToAddress] = useState<string>(
     '0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc',
   );
-  const [value, setValue] = useState<string>('');
+  const [value, setValue] = useState<string>('0');
   const [passcode, setPasscode] = useState<string>('');
 
   const handleDeposit = () => {
@@ -56,9 +64,30 @@ export const Send = observer(() => {
         onChange={e => setPasscode(e.nativeEvent.text)}
         value={passcode}
       />
-      <Button title="deposit" onPress={handleDeposit} />
+      {approvedToken(currency.symbol, currencyValueToWei(value, 18)) ? (
+        <>
+          <Button title="deposit" onPress={handleDeposit} />
+          <Text style={{color: 'red'}}>{deposit.is.withFailMessage}</Text>
+        </>
+      ) : (
+        <>
+          <Button
+            title="approve"
+            onPress={() => {
+              console.log(safeTransferContract?.address);
+              if (!safeTransferContract) return;
+              approve.run(safeTransferContract?.address);
+            }}
+          />
+          <Text style={{color: 'red'}}>{approve.is.withFailMessage}</Text>
+        </>
+      )}
       {ERC20TokenList('rinkeby').map(token => (
-        <Button title={token.symbol} onPress={() => setCurrency(token)} />
+        <Button
+          title={token.symbol}
+          onPress={() => setCurrency(token)}
+          key={token.address}
+        />
       ))}
     </ScrollView>
   );

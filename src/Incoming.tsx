@@ -13,7 +13,7 @@ export const Incoming = observer(() => {
         {incoming.list.map(trx => {
           if (trx.id === activeCollectId) {
             return (
-              <View>
+              <View key={trx.id}>
                 <TextInput
                   placeholder="passcode"
                   value={passcode}
@@ -45,7 +45,6 @@ export const Incoming = observer(() => {
               }`}
               onPress={() => {
                 setActiveCollectId(trx.id);
-                //collect.run({id: trx.id, passcode: '123321'});
               }}
             />
           );

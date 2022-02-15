@@ -20,7 +20,7 @@ export const Connect = observer(() => {
   const {address, connect, balance, block, disconnect, currency} = useAccount();
 
   const [privateKey, setPrivateKey] = useState<string>(
-    'bdaaeb35c3c67c87e2c7cb1e49467cbad04a1c5f815ba4b635db0e11fe6e789b',
+    'e843091ef8dcf8b32a505e81770029a7d3044cbcaf9745b27b1dd494f614ebd7',
   );
   const [screen, setScreen] = useState<'send' | 'incoming' | 'outgoing'>(
     'send',

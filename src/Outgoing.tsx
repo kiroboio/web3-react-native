@@ -10,6 +10,7 @@ export const Outgoing = observer(() => {
       <ScrollView>
         {outgoing.list.map(trx => (
           <Button
+            key={trx.id}
             disabled={
               trx.state === 'retrieved' ||
               trx.state === 'retrieving' ||
