@@ -8,11 +8,12 @@
  * @format
  */
 import React from 'react';
-//import "fast-text-encoding";
 import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
 import './shim';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {App as SrcApp} from './src/App';
+import {KiroboProvider} from '@kiroboio/web3-react-native-safe-transfer';
+import {Connect} from './src/Connect';
+import {INFURA_KEY, API_KEY, API_SECRET} from 'react-native-dotenv';
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -23,7 +24,12 @@ const App = () => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <SrcApp />
+      <KiroboProvider
+        infuraKey={INFURA_KEY}
+        apiKey={API_KEY}
+        apiSecret={API_SECRET}>
+        <Connect />
+      </KiroboProvider>
     </SafeAreaView>
   );
 };

@@ -1,86 +1,96 @@
+/* eslint-disable react-native/no-inline-styles */
 import {
   useAccount,
   observer,
   currencyValueToWei,
+  weiToCurrencyValue,
 } from '@kiroboio/web3-react-native-safe-transfer';
-import React, {useEffect} from 'react';
+import React, {useState} from 'react';
 
-import {View, Text, Button} from 'react-native';
+import {View, Text, Button, TextInput, ScrollView} from 'react-native';
 
-const privateKeys = [
-  'e843091ef8dcf8b32a505e81770029a7d3044cbcaf9745b27b1dd494f614ebd7',
-  'bdaaeb35c3c67c87e2c7cb1e49467cbad04a1c5f815ba4b635db0e11fe6e789b',
-];
+// const privateKeys = [
+//   'e843091ef8dcf8b32a505e81770029a7d3044cbcaf9745b27b1dd494f614ebd7',
+//   'bdaaeb35c3c67c87e2c7cb1e49467cbad04a1c5f815ba4b635db0e11fe6e789b',
+// ];
+// const sendTo = ["0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc"]
 export const Connect = observer(() => {
   const {
     address,
-    active,
     connect,
     balance,
     block,
     deposit,
-    retrieve,
-    collect,
-    outgoing,
-    incoming,
-    wallet,
     disconnect,
+    currency,
+    setCurrency,
+    ERC20TokenList,
   } = useAccount();
 
-  const handleConnect = ({key}: {key: string}) =>
-    connect.run({chainId: 4, key});
+  const [privateKey, setPrivateKey] = useState<string>(
+    'e843091ef8dcf8b32a505e81770029a7d3044cbcaf9745b27b1dd494f614ebd7',
+  );
+  const [sendToAddress, setSendToAddress] = useState<string>(
+    '0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc',
+  );
+  const [value, setValue] = useState<string>('');
+  const [passcode, setPasscode] = useState<string>('');
+
+  const handleConnect = () => connect.run({chainId: 4, key: privateKey});
   const handleDeposit = () => {
     deposit.run({
-      to: '0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc',
-      value: currencyValueToWei('0.00001', 18),
-      passcode: '123321',
+      to: sendToAddress,
+      value: currencyValueToWei(value, currency.decimals),
+      passcode,
     });
-  };
-
-  const handleRetrieve = (id: string) => {
-    retrieve.run({
-      id,
-    });
-  };
-
-  const handleCollect = (id: string) => {
-    collect.run({
-      id,
-      passcode: '123321',
-    });
-  };
-
-  const handleChangeAccount = (address: string) => {
-    wallet.setActiveAccount(address);
   };
 
   if (deposit.is.running) return <Text>Running...</Text>;
-  if (retrieve.is.running) return <Text>Retrieving...</Text>;
-  if (collect.is.running) return <Text>Collecting...</Text>;
-
   return (
-    <View>
-      <Text>block: {block}</Text>
+    <ScrollView
+      style={{paddingHorizontal: 24, paddingTop: 12, paddingBottom: 64}}>
       <Text>address: {address}</Text>
-      <Text>balance: {balance}</Text>
-      <Button title="deposit" onPress={handleDeposit} />
-
-      <Button
-        title="add address"
-        onPress={() => wallet.addAddressCmd.prepare()}
+      <Text>balance: {weiToCurrencyValue(balance, 18)}</Text>
+      <Text>currency: {currency.symbol}</Text>
+      <Text>
+        currency balance:
+        {weiToCurrencyValue(currency.balance, currency.decimals)}
+      </Text>
+      <TextInput
+        placeholder="private key"
+        onChange={e => setPrivateKey(e.nativeEvent.text)}
+        value={privateKey}
       />
-      {privateKeys.map(key => {
-        return (
-          <Button title={key} key={key} onPress={() => handleConnect({key})} />
-        );
-      })}
+      <Button title="connect" onPress={handleConnect} />
+      <TextInput
+        placeholder="send to"
+        onChange={e => setSendToAddress(e.nativeEvent.text)}
+        value={sendToAddress}
+      />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+        <TextInput
+          placeholder="amount"
+          onChange={e => setValue(e.nativeEvent.text)}
+          value={value}
+        />
+        <Text>{currency.symbol}</Text>
+      </View>
+      <TextInput
+        placeholder="passcode"
+        onChange={e => setPasscode(e.nativeEvent.text)}
+        value={passcode}
+      />
+      <Button title="deposit" onPress={handleDeposit} />
+      {ERC20TokenList('rinkeby').map(token => (
+        <Button title={token.symbol} onPress={() => setCurrency(token)} />
+      ))}
       <Button title="Disconnect" onPress={disconnect.run} />
-      {/* {incoming.list.map((trx) => {
-        return <Button title="collect" key={trx.id} onPress={() => handleCollect(trx.id)} />
-      })}
-      {outgoing.list.map((trx) => {
-        return <Button title="retrieve" key={trx.id} onPress={() => handleRetrieve(trx.id)} />
-      })} */}
-    </View>
+      <Text>block: {block}</Text>
+    </ScrollView>
   );
 });
