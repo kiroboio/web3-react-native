@@ -1,7 +1,6 @@
 import {
   useAccount,
   observer,
-  configureReactotronDebugging,
   currencyValueToWei,
 } from '@kiroboio/web3-react-native-safe-transfer';
 import React, {useEffect} from 'react';
@@ -27,9 +26,6 @@ export const Connect = observer(() => {
     wallet,
     disconnect,
   } = useAccount();
-  useEffect(() => {
-    configureReactotronDebugging({});
-  }, []);
 
   const handleConnect = ({key}: {key: string}) =>
     connect.run({chainId: 4, key});
