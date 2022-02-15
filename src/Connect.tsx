@@ -2,12 +2,14 @@
 import {
   useAccount,
   observer,
-  currencyValueToWei,
   weiToCurrencyValue,
 } from '@kiroboio/web3-react-native-safe-transfer';
 import React, {useState} from 'react';
 
 import {View, Text, Button, TextInput, ScrollView} from 'react-native';
+import {Incoming} from './Incoming';
+import {Outgoing} from './Outgoing';
+import {Send} from './Send';
 
 // const privateKeys = [
 //   'e843091ef8dcf8b32a505e81770029a7d3044cbcaf9745b27b1dd494f614ebd7',
@@ -15,40 +17,29 @@ import {View, Text, Button, TextInput, ScrollView} from 'react-native';
 // ];
 // const sendTo = ["0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc"]
 export const Connect = observer(() => {
-  const {
-    address,
-    connect,
-    balance,
-    block,
-    deposit,
-    disconnect,
-    currency,
-    setCurrency,
-    ERC20TokenList,
-  } = useAccount();
+  const {address, connect, balance, block, disconnect, currency} = useAccount();
 
   const [privateKey, setPrivateKey] = useState<string>(
-    'e843091ef8dcf8b32a505e81770029a7d3044cbcaf9745b27b1dd494f614ebd7',
+    'bdaaeb35c3c67c87e2c7cb1e49467cbad04a1c5f815ba4b635db0e11fe6e789b',
   );
-  const [sendToAddress, setSendToAddress] = useState<string>(
-    '0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc',
+  const [screen, setScreen] = useState<'send' | 'incoming' | 'outgoing'>(
+    'send',
   );
-  const [value, setValue] = useState<string>('');
-  const [passcode, setPasscode] = useState<string>('');
 
   const handleConnect = () => connect.run({chainId: 4, key: privateKey});
-  const handleDeposit = () => {
-    deposit.run({
-      to: sendToAddress,
-      value: currencyValueToWei(value, currency.decimals),
-      passcode,
-    });
-  };
 
-  if (deposit.is.running) return <Text>Running...</Text>;
+  const renderScreen = () => {
+    switch (screen) {
+      case 'send':
+        return <Send />;
+      case 'incoming':
+        return <Incoming />;
+      case 'outgoing':
+        return <Outgoing />;
+    }
+  };
   return (
-    <ScrollView
-      style={{paddingHorizontal: 24, paddingTop: 12, paddingBottom: 64}}>
+    <ScrollView style={{paddingHorizontal: 24}}>
       <Text>address: {address}</Text>
       <Text>balance: {weiToCurrencyValue(balance, 18)}</Text>
       <Text>currency: {currency.symbol}</Text>
@@ -62,35 +53,15 @@ export const Connect = observer(() => {
         value={privateKey}
       />
       <Button title="connect" onPress={handleConnect} />
-      <TextInput
-        placeholder="send to"
-        onChange={e => setSendToAddress(e.nativeEvent.text)}
-        value={sendToAddress}
-      />
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        <TextInput
-          placeholder="amount"
-          onChange={e => setValue(e.nativeEvent.text)}
-          value={value}
-        />
-        <Text>{currency.symbol}</Text>
-      </View>
-      <TextInput
-        placeholder="passcode"
-        onChange={e => setPasscode(e.nativeEvent.text)}
-        value={passcode}
-      />
-      <Button title="deposit" onPress={handleDeposit} />
-      {ERC20TokenList('rinkeby').map(token => (
-        <Button title={token.symbol} onPress={() => setCurrency(token)} />
-      ))}
+
+      {renderScreen()}
       <Button title="Disconnect" onPress={disconnect.run} />
       <Text>block: {block}</Text>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <Button title="send" onPress={() => setScreen('send')} />
+        <Button title="incoming" onPress={() => setScreen('incoming')} />
+        <Button title="outgoing" onPress={() => setScreen('outgoing')} />
+      </View>
     </ScrollView>
   );
 });
