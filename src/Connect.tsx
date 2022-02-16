@@ -11,17 +11,10 @@ import {Incoming} from './Incoming';
 import {Outgoing} from './Outgoing';
 import {Send} from './Send';
 
-// const privateKeys = [
-//   'e843091ef8dcf8b32a505e81770029a7d3044cbcaf9745b27b1dd494f614ebd7',
-//   'bdaaeb35c3c67c87e2c7cb1e49467cbad04a1c5f815ba4b635db0e11fe6e789b',
-// ];
-// const sendTo = ["0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc"]
 export const Connect = observer(() => {
   const {address, connect, balance, block, disconnect, currency} = useAccount();
 
-  const [privateKey, setPrivateKey] = useState<string>(
-    'e843091ef8dcf8b32a505e81770029a7d3044cbcaf9745b27b1dd494f614ebd7',
-  );
+  const [privateKey, setPrivateKey] = useState<string>('');
   const [screen, setScreen] = useState<'send' | 'incoming' | 'outgoing'>(
     'send',
   );
@@ -39,28 +32,37 @@ export const Connect = observer(() => {
     }
   };
   return (
-    <ScrollView style={{paddingHorizontal: 24}}>
-      <Text>address: {address}</Text>
-      <Text>balance: {weiToCurrencyValue(balance, 18)}</Text>
-      <Text>currency: {currency.symbol}</Text>
-      <Text>
-        currency balance:
-        {weiToCurrencyValue(currency.balance, currency.decimals)}
-      </Text>
-      <TextInput
-        placeholder="private key"
-        onChange={e => setPrivateKey(e.nativeEvent.text)}
-        value={privateKey}
-      />
-      <Button title="connect" onPress={handleConnect} />
-
+    <ScrollView
+      style={{}}
+      contentContainerStyle={{
+        justifyContent: 'space-between',
+        height: '100%',
+        paddingHorizontal: 12,
+      }}>
+      <View>
+        <Text>address: {address}</Text>
+        <Text>balance: {weiToCurrencyValue(balance, 18)}</Text>
+        <Text>currency: {currency.symbol}</Text>
+        <Text>
+          currency balance:
+          {weiToCurrencyValue(currency.balance, currency.decimals)}
+        </Text>
+        <TextInput
+          placeholder="private key"
+          onChange={e => setPrivateKey(e.nativeEvent.text)}
+          value={privateKey}
+        />
+        <Button title="connect" onPress={handleConnect} />
+      </View>
       {renderScreen()}
-      <Button title="Disconnect" onPress={disconnect.run} />
-      <Text>block: {block}</Text>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <Button title="send" onPress={() => setScreen('send')} />
-        <Button title="incoming" onPress={() => setScreen('incoming')} />
-        <Button title="outgoing" onPress={() => setScreen('outgoing')} />
+      <View>
+        <Button title="Disconnect" onPress={disconnect.run} />
+        <Text style={{marginVertical: 1}}>block: {block}</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Button title="send form" onPress={() => setScreen('send')} />
+          <Button title="incoming" onPress={() => setScreen('incoming')} />
+          <Button title="outgoing" onPress={() => setScreen('outgoing')} />
+        </View>
       </View>
     </ScrollView>
   );

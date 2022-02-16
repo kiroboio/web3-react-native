@@ -8,11 +8,6 @@ import React, {useState} from 'react';
 
 import {View, Text, Button, TextInput, ScrollView} from 'react-native';
 
-// const privateKeys = [
-//   'e843091ef8dcf8b32a505e81770029a7d3044cbcaf9745b27b1dd494f614ebd7',
-//   'bdaaeb35c3c67c87e2c7cb1e49467cbad04a1c5f815ba4b635db0e11fe6e789b',
-// ];
-// const sendTo = ["0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc"]
 export const Send = observer(() => {
   const {
     deposit,
@@ -22,12 +17,11 @@ export const Send = observer(() => {
     approvedToken,
     approve,
     safeTransferContract,
+    address,
   } = useAccount();
 
-  const [sendToAddress, setSendToAddress] = useState<string>(
-    '0x7da67A5f8d4Bd1db493cc5a484f0D00CBe282DEc',
-  );
-  const [value, setValue] = useState<string>('0');
+  const [sendToAddress, setSendToAddress] = useState<string>('');
+  const [value, setValue] = useState<string>('');
   const [passcode, setPasscode] = useState<string>('');
 
   const handleDeposit = () => {
@@ -37,10 +31,10 @@ export const Send = observer(() => {
       passcode,
     });
   };
-
+  if (!address) return null;
   if (deposit.is.running) return <Text>Running...</Text>;
   return (
-    <ScrollView style={{paddingHorizontal: 24}}>
+    <ScrollView>
       <TextInput
         placeholder="send to"
         onChange={e => setSendToAddress(e.nativeEvent.text)}
@@ -66,12 +60,17 @@ export const Send = observer(() => {
       />
       {approvedToken(currency.symbol, currencyValueToWei(value, 18)) ? (
         <>
-          <Button title="deposit" onPress={handleDeposit} />
+          <Button
+            title="deposit"
+            onPress={handleDeposit}
+            disabled={!passcode}
+          />
           <Text style={{color: 'red'}}>{deposit.is.withFailMessage}</Text>
         </>
       ) : (
         <>
           <Button
+            disabled={approve.is.running}
             title="approve"
             onPress={() => {
               console.log(safeTransferContract?.address);
@@ -83,11 +82,13 @@ export const Send = observer(() => {
         </>
       )}
       {ERC20TokenList('rinkeby').map(token => (
-        <Button
-          title={token.symbol}
-          onPress={() => setCurrency(token)}
-          key={token.address}
-        />
+        <View style={{marginVertical: 1}}>
+          <Button
+            title={token.symbol}
+            onPress={() => setCurrency(token)}
+            key={token.address}
+          />
+        </View>
       ))}
     </ScrollView>
   );
