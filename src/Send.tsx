@@ -6,7 +6,7 @@ import {
 } from '@kiroboio/web3-react-native-safe-transfer';
 import React, {useState} from 'react';
 
-import {View, Text, Button, TextInput, ScrollView} from 'react-native';
+import {View, Text, TextInput, ScrollView, Button} from 'react-native';
 
 export const Send = observer(() => {
   const {
@@ -31,6 +31,7 @@ export const Send = observer(() => {
       passcode,
     });
   };
+
   if (!address) return null;
   if (deposit.is.running) return <Text>Running...</Text>;
   return (
@@ -73,7 +74,6 @@ export const Send = observer(() => {
             disabled={approve.is.running}
             title="approve"
             onPress={() => {
-              console.log(safeTransferContract?.address);
               if (!safeTransferContract) return;
               approve.run(safeTransferContract?.address);
             }}
