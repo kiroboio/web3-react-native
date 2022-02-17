@@ -12,7 +12,8 @@ import {Outgoing} from './Outgoing';
 import {Send} from './Send';
 
 export const Connect = observer(() => {
-  const {address, connect, balance, block, disconnect, currency} = useAccount();
+  const {address, connect, balance, block, disconnect, currency, tokenBalance} =
+    useAccount();
 
   const [privateKey, setPrivateKey] = useState<string>();
   const [screen, setScreen] = useState<'send' | 'incoming' | 'outgoing'>(
@@ -33,7 +34,6 @@ export const Connect = observer(() => {
   };
   return (
     <ScrollView
-      style={{}}
       contentContainerStyle={{
         justifyContent: 'space-between',
         height: '100%',
@@ -41,12 +41,16 @@ export const Connect = observer(() => {
       }}>
       <View>
         <Text>address: {address}</Text>
-        <Text>balance: {weiToCurrencyValue(balance, 18)}</Text>
-        <Text>currency: {currency.symbol}</Text>
-        <Text>
-          currency balance:
-          {weiToCurrencyValue(currency.balance, currency.decimals)}
-        </Text>
+        <Text>Eth balance: {weiToCurrencyValue(balance, 18)}</Text>
+        {currency.symbol !== 'ETH' ? (
+          <>
+            <Text>token: {currency.symbol}</Text>
+            <Text>
+              token balance:
+              {weiToCurrencyValue(tokenBalance, currency.decimals)}
+            </Text>
+          </>
+        ) : null}
         <TextInput
           placeholder="private key"
           onChange={e => setPrivateKey(e.nativeEvent.text)}
