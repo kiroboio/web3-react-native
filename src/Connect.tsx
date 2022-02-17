@@ -14,9 +14,7 @@ import {Send} from './Send';
 export const Connect = observer(() => {
   const {address, connect, balance, block, disconnect, currency} = useAccount();
 
-  const [privateKey, setPrivateKey] = useState<string>(
-    'e843091ef8dcf8b32a505e81770029a7d3044cbcaf9745b27b1dd494f614ebd7',
-  );
+  const [privateKey, setPrivateKey] = useState<string>();
   const [screen, setScreen] = useState<'send' | 'incoming' | 'outgoing'>(
     'send',
   );
